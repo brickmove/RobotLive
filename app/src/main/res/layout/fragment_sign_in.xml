@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/sign_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_home"
+        android:layout_width="40dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="163dp"
+        android:layout_marginEnd="172dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="732dp"
+        android:gravity="center_vertical|end"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/white"
+        android:text="@string/hone"
+        android:textSize="17sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/tv_welcome_back"
+        android:layout_width="201dp"
+        android:layout_height="33dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="150dp"
+        android:layout_marginTop="92dp"
+        android:layout_marginBottom="643dp"
+        android:gravity="center_vertical|end"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/welcome_back"
+        android:text="@string/welcome_back"
+        android:textSize="30sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/tv_sign"
+        android:layout_width="240dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="118dp"
+        android:layout_marginTop="132dp"
+        android:layout_marginBottom="612dp"
+        android:gravity="center_vertical|end"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/sign_color"
+        android:text="@string/sign_account"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <LinearLayout
+        android:id="@+id/account"
+        android:layout_width="327dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="249dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/input_background"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_email"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/email_img"
+            android:src="@mipmap/email" />
+
+        <EditText
+            android:id="@+id/et_account"
+            android:layout_width="125dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="146dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:autofillHints="username"
+            android:inputType="text"
+            android:text="@string/email_text"
+            android:textColor="@color/input_default_color"
+            android:background="@null"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/password"
+        android:layout_width="327dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="321dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/input_background"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_pwd"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/email_img"
+            android:src="@mipmap/pwd" />
+
+        <EditText
+            android:id="@+id/et_pwd"
+            android:layout_width="125dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="146dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:autofillHints="password"
+            android:inputType="textPassword"
+            android:text="@string/pwd_text"
+            android:textColor="@color/input_default_color"
+            android:background="@null"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/ck_agree"
+        android:button="@drawable/round_checkbox"
+        android:layout_width="327dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="33dp"
+        android:layout_marginTop="401dp"
+        android:layout_marginBottom="343dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:text="@string/agree_check"
+        android:textSize="12sp"
+        android:textColor="@color/sign_color"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/bt_sign_in"
+        android:layout_width="327dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="601dp"
+        android:layout_marginBottom="119dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/sign_button"
+        android:text="@string/sign_button_tx"
+        android:textAllCaps="false"
+        android:gravity="center"
+        android:textSize="20sp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

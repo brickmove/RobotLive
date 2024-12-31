@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Robot Live</string>
+    <string name="time">9:41</string>
+    <string name="hone">hone</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="sign_account">Sign in to your continue account</string>
+    <string name="email_img">email img</string>
+    <string name="email_text">Enter your email</string>
+    <string name="pwd_text">Enter your password</string>
+    <string name="agree_check">I agree to the User Agreement and Privacy Policy</string>
+    <string name="sign_button_tx">Sign In</string>
+    <string name="robot_control">Robot control</string>
+    <string name="robot_side">Robot side</string>
 </resources>

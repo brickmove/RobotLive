@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp">
+
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="30dp"
+        android:layout_height="21dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical|end"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/white"
+        android:text="@string/time"
+        android:textSize="15sp" />
+
+    <ImageView
+        android:id="@+id/signal_img"
+        android:layout_width="17dp"
+        android:layout_height="11dp"
+        android:layout_marginStart="294dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginTop="16dp"
+        android:src="@mipmap/signal"/>
+    <ImageView
+        android:id="@+id/wifi_img"
+        android:layout_width="17dp"
+        android:layout_height="11dp"
+        android:layout_marginStart="316dp"
+        android:layout_marginEnd="44dp"
+        android:layout_marginTop="16dp"
+        android:src="@mipmap/wifi"/>
+    <ImageView
+        android:id="@+id/battery_img"
+        android:layout_width="24dp"
+        android:layout_height="11dp"
+        android:layout_marginStart="336dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginTop="16dp"
+        android:src="@mipmap/battery"/>
+
+    <TextView
+        android:id="@+id/tv_home"
+        android:layout_width="40dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="163dp"
+        android:layout_marginEnd="172dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginBottom="0dp"
+        android:gravity="center_vertical|end"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/white"
+        android:text="@string/hone"
+        android:textSize="17sp"
+        android:visibility="invisible"
+        />
+
+    <ImageView
+        android:id="@+id/iv_return"
+        android:layout_width="9dp"
+        android:layout_height="17dp"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="58dp"
+        android:layout_marginEnd="343dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@mipmap/back"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/tv_robot_control"
+        android:layout_width="109dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="135dp"
+        android:layout_marginEnd="131dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginBottom="732dp"
+        android:textColor="@color/robot_control"
+        android:gravity="center_vertical|start"
+        android:textAlignment="viewStart"
+        android:text="@string/robot_control"
+        android:textSize="17sp"
+        android:visibility="invisible"/>
+</RelativeLayout>

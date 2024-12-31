@@ -20,13 +20,12 @@ class SPUtils() {
         }
         return INSTANCE!!
     }
-
     companion object {
         private const val TAG = "PrefManager"
         private const val MAX_RETRIES = 3
         private const val DEFAULT_SP_NAME = "DELIVERY_SP_DATA"
-    }
 
+    }
     fun putBoolean(key: String, value: Boolean, isCommit: Boolean) {
         if (isCommit) {
             var success = false

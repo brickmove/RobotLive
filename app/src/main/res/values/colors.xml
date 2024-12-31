@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="welcome_back">#ffE7166B</color>
+    <color name="sign_color">#ffD6D6D6</color>
+    <color name="sign_background">#ff121212</color>
+    <color name="input_background">#ff21212F</color>
+    <color name="input_default_color">#ffA6A6A6</color>
+    <color name="robot_control">#ffEBEBF6</color>
+    <color name="robot_side">#ffC5C5D1</color>
 </resources>

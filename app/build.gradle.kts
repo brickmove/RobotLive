@@ -47,6 +47,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildFeatures {
+        compose=true
+        viewBinding=true
+    }
 }
 
 dependencies {
@@ -61,6 +65,26 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
     implementation(libs.utilcode)
+    implementation(libs.jessyan.retrofit.url.manager)
+    implementation(libs.autosize)
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
+    implementation(libs.gson)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.converter.gson)
+    implementation(libs.adapter.rxjava2)
+    implementation(libs.androidx.cardview)
+    implementation(libs.androidx.multidex)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.gridlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.databinding.runtime)
+    implementation(libs.eventbus)
+    implementation(libs.material)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
