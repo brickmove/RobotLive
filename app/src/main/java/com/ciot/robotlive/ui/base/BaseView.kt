@@ -1,5 +1,5 @@
 package com.ciot.robotlive.ui.base
 
 interface BaseView {
-    fun showToast(updateText: String, lengthShort: Int)
+    fun showToast(updateText: String)
 }

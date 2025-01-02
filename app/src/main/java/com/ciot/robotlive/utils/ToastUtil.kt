@@ -29,6 +29,14 @@ object ToastUtil {
         }
     }
 
+    fun showToast(lengthShort: Int, context: Context?, msg: String?) {
+        if (lengthShort == Toast.LENGTH_LONG) {
+            showLong(context, msg)
+        } else {
+            showShort(context, msg)
+        }
+    }
+
     fun cancelToast() {
         mToast?.cancel()
     }

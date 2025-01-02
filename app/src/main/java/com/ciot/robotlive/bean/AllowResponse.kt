@@ -1,4 +1,4 @@
-package com.ciot.deliverywear.bean
+package com.ciot.robotlive.bean
 
 /**
  * Created by p'c on 2024/7/8.
@@ -44,6 +44,11 @@ class AllowResponse {
          * 接入域名
          */
         private var domain: String? = null
+        /**
+         * 接入端口
+         */
+        private var port: Int? = null
+
 
         fun getHost(): String? {
             return this.host
@@ -62,5 +67,12 @@ class AllowResponse {
             this.domain = domain
         }
 
+        fun getPort(): Int? {
+            return port
+        }
+
+        fun setPort(port: Int) {
+            this.port = port
+        }
     }
 }

@@ -5,7 +5,11 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.ThreadUtils
+import com.ciot.robotlive.bean.AllowResponse
+import com.ciot.robotlive.bean.RobotAllResponse
 import com.ciot.robotlive.bean.RobotData
+import com.ciot.robotlive.bean.RobotInfoResponse
 import com.ciot.robotlive.constant.ConstantLogic
 import com.ciot.robotlive.constant.NetConstant
 import com.ciot.robotlive.network.interceptor.HttpLoggingInterceptor
@@ -15,6 +19,7 @@ import com.ciot.robotlive.network.tcp.TcpClient
 import com.ciot.robotlive.network.tcp.TcpMsgListener
 import com.ciot.robotlive.utils.Security
 import com.ciot.robotlive.utils.MyLog
+import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -25,6 +30,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -58,6 +64,7 @@ class RetrofitManager {
     private var isLoadingSuccess: AtomicReference<Boolean> = AtomicReference(false)
     private var defaultServer: AtomicReference<String> = AtomicReference()
     private var tcpIp: AtomicReference<String> = AtomicReference()
+    private var tcpPort: AtomicReference<Int> = AtomicReference()
 
     @Volatile
     private var mNidMap: MutableMap<String, String>? = HashMap()
@@ -118,7 +125,7 @@ class RetrofitManager {
         tcpClient!!.connectAndRegister()
     }
 
-    private fun watchAllow(baseUrl: String, observer: Observer<ResponseBody>) {
+    private fun allow(baseUrl: String, observer: Observer<ResponseBody>) {
         setPropertyDomain(baseUrl)
         getWuHanApiService()
             .allow()
@@ -127,6 +134,109 @@ class RetrofitManager {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(observer)
+    }
+
+    fun init() {
+        MyLog.d(TAG, "RetrofitManager init start...")
+        allow(getDefaultServer(), object : Observer<ResponseBody> {
+            override fun onComplete() {
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                mWatchAllowDisable = d
+                addSubscription(d)
+            }
+
+            override fun onNext(response: ResponseBody) {
+                val allowResponse = GsonUtils.fromJson(String(response.bytes()), AllowResponse::class.java)
+                MyLog.d(TAG, "allowResponse: " + GsonUtils.toJson(allowResponse))
+                if (allowResponse.isSuccess()) {
+                    val data: AllowResponse.DataBean? = allowResponse.getData()
+                    if (data != null) {
+                        data.getDomain()?.let { setTcpIp(it) }
+                        data.getPort()?.let { setTcpPort(it) }
+                        //initTcpService()
+                    }
+                } else {
+                    MyLog.w(TAG, "请求接入服务器失败...")
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                //重试10次 每次间隔三秒后才算报错。避免第一次开机无网络直接报错问题
+                if (isNeedRetry && retryCount < 20) {
+                    ThreadUtils.getMainHandler().postDelayed({
+                        init()
+                    }, 3000)
+                    retryCount++
+                    MyLog.d(TAG, "===retryCount====$retryCount")
+                } else {
+                    MyLog.e(TAG, "allow error->${e.message}")
+                    MyLog.w(TAG, "请求接入服务器失败...")
+                }
+            }
+        })
+    }
+
+    private var getRobotsRetryCount: Int = 1
+    fun getRobotsForHome() {
+        val token = getToken()
+        val project = getProject()
+        if (token.isNullOrEmpty() || project.isNullOrEmpty()) {
+            MyLog.e(TAG, "getRobotsForHome param err--->token: $token, project: $project")
+            return
+        }
+        val start ="0"
+        val limit ="100"
+        //MyLog.d(TAG, "getRobotsForHome param--->token: $token, project: $project")
+        getWuHanApiService().findRobotByProject(token, project, start, limit)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object:Observer<RobotAllResponse>{
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onNext(body: RobotAllResponse) {
+                    MyLog.d(TAG, "RobotAllResponse: " + GsonUtils.toJson(body))
+                    parseRobotAllResponseBody(body)
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.w(TAG,"getRobotsForHome onError: ${e.message}")
+                    if (getRobotsRetryCount <= 5) {
+                        ThreadUtils.getMainHandler().postDelayed({
+                            getRobotsForHome()
+                        }, 500)
+                    } else {
+                        MyLog.e(TAG, " get robot info err count: $getRobotsRetryCount")
+                    }
+                    getRobotsRetryCount++
+                }
+
+                override fun onComplete() {
+
+                }
+            })
+    }
+
+    fun parseRobotAllResponseBody(body: RobotAllResponse) {
+        val res: RobotAllResponse = body
+        val total: Int? = res.total
+        val robotInfo: List<RobotInfoResponse>? = res.datas
+        mRobotId = mutableListOf()
+        mRobotData = mutableListOf()
+        if (total == null || total == 0 || robotInfo.isNullOrEmpty()) {
+            MyLog.d(TAG, "parseRobotAllResponseBody robotInfo is empty............")
+            return
+        }
+        robotInfo.forEach {
+            val robotData = RobotData()
+            robotData.id = it.id
+            robotData.link = it.link == true
+            robotData.name = it.name
+            mRobotData!!.add(robotData)
+        }
     }
 
     /**
@@ -269,6 +379,10 @@ class RetrofitManager {
 
                 }
             })
+    }
+
+    fun firstLogin(): Observable<ResponseBody> {
+        return getWuHanApiService().md5Login(getUserRequestBody(true))
     }
 
     private fun getUserRequestBody(isGetUserAndPwm: Boolean): RequestBody {
@@ -433,6 +547,14 @@ class RetrofitManager {
         tcpIp.set(domain)
     }
 
+    private fun getTcpPort(): Int {
+        return tcpPort.get()
+    }
+
+    fun setTcpPort(port: Int) {
+        tcpPort.set(port)
+    }
+
     fun getTcpClient() : TcpClient? {
         return tcpClient
     }
@@ -449,4 +571,6 @@ class RetrofitManager {
         }
         disposable?.let { mCompositeDisposable?.add(it) }
     }
+
+
 }

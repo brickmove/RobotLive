@@ -27,11 +27,11 @@ interface ConstantLogic {
         const val EVENT_RECONNECT_TCP = "EVENT_RECONNECT_TCP" // 重连tcp
 
         // SharedPreferences val
-        const val BIND_ACCOUNT = "BIND_KEY"
-        const val BIND_PASSWORD = "BIND_PASSWORD"
-        const val BIND_SERVER = "BIND_SERVER"
-        const val IS_BOUND = "IS_BOUND"
-        const val IS_SIGNED_IN = "IS_SIGNED_IN"
+        const val SP_BIND_SERVER = "SP_BIND_SERVER"
+        const val SP_IS_SIGNED_IN = "SP_IS_SIGNED_IN"
+        const val SP_SAVE_SIGN_ACCOUNT = "SP_SAVE_SIGN_ACCOUNT"
+        const val SP_SAVE_SIGN_PWD = "SP_SAVE_SIGN_PWD"
+        const val SP_SAVE_SIGN_MD5_PWD = "SP_SAVE_SIGN_MD5_PWD"
 
         // file constant
         val APP_PATH: String = Environment.getExternalStorageDirectory().toString() + File.separator + "RobotLog"

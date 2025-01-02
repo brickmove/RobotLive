@@ -10,10 +10,14 @@ import com.ciot.robotlive.constant.ConstantLogic
 import com.ciot.robotlive.databinding.ActivityMainBinding
 import com.ciot.robotlive.ui.base.BaseActivity
 import com.ciot.robotlive.ui.base.BaseFragment
+import com.ciot.robotlive.ui.fragment.ControlFragment
 import com.ciot.robotlive.ui.fragment.FragmentFactory
+import com.ciot.robotlive.ui.fragment.HomeFragment
 import com.ciot.robotlive.utils.MyLog
+import com.ciot.robotlive.utils.ToastUtil
+import java.util.LinkedList
 
-class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
+class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListener {
     companion object {
         private const val TAG = "MainActivity"
     }
@@ -30,7 +34,7 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         MyLog.d(TAG, "MainActivity onCreate start")
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        mPresenter?.initSetting(this@MainActivity)
+        mPresenter?.initSetting()
     }
 
     override fun onResume() {
@@ -39,9 +43,26 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
 
     }
 
+    override fun update(results: LinkedList<out DealResult>?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getCurrentFragment(): BaseFragment? {
+        return currentfragment
+    }
+
+    override fun showToast(updateText: String) {
+        runOnUiThread { ToastUtil.showToast(0,this@MainActivity, updateText) }
+    }
+
     fun showSign() {
         MyLog.d(TAG, "MainActivity showSign >>>>>>>>>")
         updateFragment(ConstantLogic.MSG_TYPE_SIGN, null)
+    }
+
+    fun showHome() {
+        MyLog.d(TAG, "MainActivity showHome >>>>>>>>>")
+        updateFragment(ConstantLogic.MSG_TYPE_HOME, mPresenter?.getHomeData())
     }
 
     private fun initListener() {
@@ -51,13 +72,17 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
     override fun onClick(view: View?) {
         when (view) {
             binding.headView.ivReturn -> {
-                updateFragment(ConstantLogic.MSG_TYPE_SIGN, null)
+                if (currentfragment is HomeFragment) {
+                    showSign()
+                } else if (currentfragment is ControlFragment) {
+                    showHome()
+                }
             }
         }
     }
 
-    fun updateFragment(type: Int, result: DealResult?) {
-        getCurrentFragment(type)
+    private fun updateFragment(type: Int, result: DealResult?) {
+        getFragment(type)
         changeFragment(type, currentfragment)
         setHeadView(type)
         if (result != null) {
@@ -65,7 +90,7 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
         }
     }
 
-    private fun getCurrentFragment(type: Int) {
+    private fun getFragment(type: Int) {
         currentfragment = FragmentFactory.createFragment(type)
     }
 

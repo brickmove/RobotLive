@@ -11,4 +11,7 @@
     <string name="sign_button_tx">Sign In</string>
     <string name="robot_control">Robot control</string>
     <string name="robot_side">Robot side</string>
+    <string name="robot_example">Lete-Robot01</string>
+    <string name="robot_location">Location of area shopping malls</string>
+    <string name="ctl_button_tx">Control</string>
 </resources>

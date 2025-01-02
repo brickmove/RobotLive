@@ -14,8 +14,7 @@ class DealResult {
     var navInfo: String? = null
     var robotList: List<String>? = null
     var robotInfoList: List<RobotData>? = null
-    var areaInfoList: List<String>? = null
-    var pointInfoList: List<String>? = null
+
     // 是否震动
     var isVibratorOn: Boolean = false
     override fun toString(): String {
@@ -24,8 +23,6 @@ class DealResult {
                 "selectPoint, $selectPoint" +
                 "robotList = $robotList, " +
                 "robotInfoList = $robotInfoList, " +
-                "areaInfoList = $areaInfoList" +
-                "pointInfoList = $pointInfoList" +
                 ")"
     }
 }

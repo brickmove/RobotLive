@@ -1,5 +1,6 @@
 package com.ciot.robotlive.network
 
+import com.ciot.robotlive.bean.RobotAllResponse
 import io.reactivex.Observable
 import me.jessyan.retrofiturlmanager.RetrofitUrlManager
 import okhttp3.RequestBody
@@ -16,10 +17,17 @@ interface WuhanApiService {
     @POST("/api/Users/md5Login")
     fun md5Login(@Body body: RequestBody): Observable<ResponseBody>
 
-    /*获取网关*/
+    /*获取网关 tcp端口*/
     @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
     @GET("/api/fittings/route")
     fun allow(): Observable<ResponseBody>
 
-
+    /*根据项目id获取机器人列表*/
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
+    @GET("/api/Robots/findByProject")
+    fun findRobotByProject(@Query("access_token") token: String?,
+                           @Query("projectid") projectId: String?,
+                           @Query("start") start: String?,
+                           @Query("limit") limit: String?,
+    ): Observable<RobotAllResponse>
 }
