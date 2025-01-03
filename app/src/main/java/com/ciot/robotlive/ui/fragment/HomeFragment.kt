@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.blankj.utilcode.util.GsonUtils
 import com.ciot.robotlive.bean.DealResult
 import com.ciot.robotlive.bean.RobotData
 import com.ciot.robotlive.databinding.FragmentHomeBinding
@@ -14,6 +15,7 @@ import com.ciot.robotlive.ui.base.BaseFragment
 import com.ciot.robotlive.ui.custom.MenuListDecoration
 import com.ciot.robotlive.ui.custom.RobotDiffCallback
 import com.ciot.robotlive.ui.custom.RobotListDecoration
+import com.ciot.robotlive.utils.MyLog
 
 class HomeFragment : BaseFragment() {
     companion object {
@@ -83,6 +85,7 @@ class HomeFragment : BaseFragment() {
             mDataList.clear()
         }
         data.robotInfoList?.let { mDataList.addAll(it) }
+        MyLog.d(TAG, "refreshData: " + GsonUtils.toJson(mDataList))
         val diffCallback = RobotDiffCallback(oldList, mDataList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         robotListAdapter?.let { diffResult.dispatchUpdatesTo(it) }

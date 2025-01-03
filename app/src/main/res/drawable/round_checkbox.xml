@@ -14,7 +14,7 @@
             <!-- 内部填充 (可选) -->
             <item android:left="6dp" android:right="6dp" android:top="6dp" android:bottom="6dp">
                 <shape android:shape="oval">
-                    <solid android:color="@color/sign_background" />
+                    <solid android:color="@color/teal_200" />
                 </shape>
             </item>
         </layer-list>

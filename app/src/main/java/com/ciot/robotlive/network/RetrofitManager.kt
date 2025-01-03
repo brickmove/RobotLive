@@ -220,6 +220,18 @@ class RetrofitManager {
             })
     }
 
+    fun getRobotAll(): Observable<RobotAllResponse>? {
+        val token = getToken()
+        val project = getProject()
+        if (token.isNullOrEmpty() || project.isNullOrEmpty()) {
+            MyLog.e(TAG, "getRobotsForHome param err--->token: $token, project: $project")
+            return null
+        }
+        val start ="0"
+        val limit ="100"
+        return getWuHanApiService().findRobotByProject(token, project, start, limit)
+    }
+
     fun parseRobotAllResponseBody(body: RobotAllResponse) {
         val res: RobotAllResponse = body
         val total: Int? = res.total
@@ -394,9 +406,8 @@ class RetrofitManager {
         val root = JSONObject()
         root.put("username", getWuHanUserName())
         root.put("password", getWuHanPassWord())
-
+        MyLog.d(TAG, "ready login wuhan Server, requestBody: " + GsonUtils.toJson(root))
         val requestBody: RequestBody = RequestBody.create("application/json; charset=utf-8".toMediaTypeOrNull(), root.toString())
-        MyLog.d(TAG, "ready login wuhan Server, requestBody: " + GsonUtils.toJson(requestBody))
         return requestBody
     }
 

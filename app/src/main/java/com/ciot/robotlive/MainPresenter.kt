@@ -3,8 +3,10 @@ package com.ciot.robotlive
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.ciot.robotlive.bean.DealResult
+import com.ciot.robotlive.bean.RobotAllResponse
 import com.ciot.robotlive.constant.ConstantLogic
 import com.ciot.robotlive.constant.NetConstant
 import com.ciot.robotlive.databinding.ActivityMainBinding
@@ -35,7 +37,6 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
     private var mContext: Context? = null
     var data: LinkedList<DealResult>? = null
         private set
-    private var spUtils: SPUtils? = null
 
     init {
         initListener()
@@ -48,7 +49,7 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
     fun initSetting() {
         setDefaultServer()
         getCurTime(view.binding)
-        if (spUtils?.getInstance()?.getBoolean(ConstantLogic.SP_IS_SIGNED_IN, true) == false) {
+        if (!SPUtils.getBoolean(ConstantLogic.SP_IS_SIGNED_IN, false)) {
             view.showSign()
         }
     }
@@ -70,9 +71,9 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
 
     // 持久化
     private fun saveSignInfo(account: String, password: String, md5Pwd: String) {
-        spUtils?.getInstance()?.putString(ConstantLogic.SP_SAVE_SIGN_ACCOUNT, account)
-        spUtils?.getInstance()?.putString(ConstantLogic.SP_SAVE_SIGN_PWD, password)
-        spUtils?.getInstance()?.putString(ConstantLogic.SP_SAVE_SIGN_MD5_PWD, md5Pwd)
+        SPUtils.putString(ConstantLogic.SP_SAVE_SIGN_ACCOUNT, account)
+        SPUtils.putString(ConstantLogic.SP_SAVE_SIGN_PWD, password)
+        SPUtils.putString(ConstantLogic.SP_SAVE_SIGN_MD5_PWD, md5Pwd)
     }
 
     // 登录
@@ -99,7 +100,7 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
                 }
 
                 override fun onError(e: Throwable) {
-                    if (loginRetryCount <= 5) {
+                    if (loginRetryCount < 3) {
                         ThreadUtils.getMainHandler().postDelayed({
                             firstLogin()
                         }, 2000)
@@ -112,7 +113,40 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
 
                 override fun onComplete() {
                     RetrofitManager.instance.init()
-                    RetrofitManager.instance.getRobotsForHome()
+                    //RetrofitManager.instance.getRobotsForHome()
+                    getRobots()
+                }
+            })
+    }
+
+    private var getRobotsRetryCount: Int = 1
+    fun getRobots() {
+        RetrofitManager.instance.getRobotAll()
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe(object:Observer<RobotAllResponse>{
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onNext(body: RobotAllResponse) {
+                    MyLog.d(TAG, "RobotAllResponse: " + GsonUtils.toJson(body))
+                    RetrofitManager.instance.parseRobotAllResponseBody(body)
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.w(TAG,"getRobots onError: ${e.message}")
+                    if (getRobotsRetryCount <= 5) {
+                        ThreadUtils.getMainHandler().postDelayed({
+                            getRobots()
+                        }, 500)
+                    } else {
+                        MyLog.e(TAG, " get robot info err count: $getRobotsRetryCount")
+                    }
+                    getRobotsRetryCount++
+                }
+
+                override fun onComplete() {
                     view.showHome()
                 }
             })
@@ -128,10 +162,10 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
 
     // 设置默认服务器
     private fun setDefaultServer() {
-        if (spUtils?.getInstance()?.getString(ConstantLogic.SP_BIND_SERVER).isNullOrEmpty()) {
-            spUtils?.getInstance()?.putString(ConstantLogic.SP_BIND_SERVER, NetConstant.DEFAULT_SERVICE_URL)
+        if (SPUtils.getString(ConstantLogic.SP_BIND_SERVER).isNullOrEmpty()) {
+            SPUtils.putString(ConstantLogic.SP_BIND_SERVER, NetConstant.DEFAULT_SERVICE_URL)
         }
-        spUtils?.getInstance()?.getString(ConstantLogic.SP_BIND_SERVER)
+        SPUtils.getString(ConstantLogic.SP_BIND_SERVER)
             ?.let { RetrofitManager.instance.setDefaultServer(it) }
     }
 }

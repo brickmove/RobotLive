@@ -2,127 +2,81 @@ package com.ciot.robotlive.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
-// 存储绑定信息
-class SPUtils() {
-    private val pref: SharedPreferences =
+// 使用对象表达式实现单例模式
+object SPUtils {
+
+    private const val TAG = "PrefManager"
+    private const val MAX_RETRIES = 3
+    private const val DEFAULT_SP_NAME = "DELIVERY_SP_DATA"
+
+    // 获取 SharedPreferences 实例
+    private val pref: SharedPreferences by lazy {
         ContextUtil.getContext().getSharedPreferences(DEFAULT_SP_NAME, Context.MODE_PRIVATE)
-    private val editor: SharedPreferences.Editor = pref.edit()
-    @Volatile
-    private var INSTANCE: SPUtils? = null
-    fun getInstance(): SPUtils {
-        if (INSTANCE == null) {
-            synchronized(SPUtils::class.java) {
-                if (INSTANCE == null) {
-                    INSTANCE = SPUtils()
-                }
-            }
-        }
-        return INSTANCE!!
     }
-    companion object {
-        private const val TAG = "PrefManager"
-        private const val MAX_RETRIES = 3
-        private const val DEFAULT_SP_NAME = "DELIVERY_SP_DATA"
 
-    }
-    fun putBoolean(key: String, value: Boolean, isCommit: Boolean) {
+    /**
+     * 泛型方法用于存储各种类型的值
+     */
+    private inline fun <reified T> put(key: String, value: T, isCommit: Boolean) {
         if (isCommit) {
             var success = false
             var attempts = 0
             while (!success && attempts < MAX_RETRIES) {
-                editor.putBoolean(key, value)
-                success = editor.commit()
+                pref.edit(commit = true) {
+                    when (value) {
+                        is Boolean -> putBoolean(key, value)
+                        is String -> putString(key, value)
+                        is Int -> putInt(key, value)
+                        else -> throw IllegalArgumentException("Unsupported type: ${value!!::class.java}")
+                    }
+                }
+                success = pref.contains(key) && pref.all[key] == value
                 if (success) {
-                    MyLog.d(TAG, "Set bool value to $value successfully")
+                    MyLog.d(TAG, "Set value to $value successfully")
                 } else {
-                    MyLog.d(TAG, "Failed to set bool value to $value. Attempt ${attempts + 1} of $MAX_RETRIES")
+                    MyLog.d(TAG, "Failed to set value to $value. Attempt ${attempts + 1} of $MAX_RETRIES")
                 }
                 attempts++
             }
         } else {
-            editor.putBoolean(key, value)
-            editor.apply()
-        }
-    }
-
-    fun putBoolean(key: String, value: Boolean) {
-        this.putBoolean(key, value, false)
-    }
-
-    fun getBoolean(key: String, defaultValue: Boolean): Boolean {
-        return pref.getBoolean(key, defaultValue)
-    }
-
-    fun getBoolean(key: String): Boolean {
-        return getBoolean(key, false)
-    }
-
-    fun putString(key: String, value: String, isCommit: Boolean) {
-        if (isCommit) {
-            var success = false
-            var attempts = 0
-            while (!success && attempts < MAX_RETRIES) {
-                editor.putString(key, value)
-                success = editor.commit()
-                if (success) {
-                    MyLog.d(TAG, "Set string value to $value successfully")
-                } else {
-                    MyLog.d(TAG, "Failed to set string value to $value. Attempt ${attempts + 1} of $MAX_RETRIES")
+            pref.edit {
+                when (value) {
+                    is Boolean -> putBoolean(key, value)
+                    is String -> putString(key, value)
+                    is Int -> putInt(key, value)
+                    else -> throw IllegalArgumentException("Unsupported type: ${value!!::class.java}")
                 }
-                attempts++
             }
-        } else {
-            editor.putString(key, value)
-            editor.apply()
         }
     }
 
-    fun putString(key: String, value: String) {
-        this.putString(key, value, false)
-    }
+    // 存储布尔值
+    fun putBoolean(key: String, value: Boolean, isCommit: Boolean = false) =
+        put(key, value, isCommit)
 
-    fun getString(key: String, defaultValue: String): String? {
-        return pref.getString(key, defaultValue)
-    }
+    // 获取布尔值
+    fun getBoolean(key: String, defaultValue: Boolean = false): Boolean =
+        pref.getBoolean(key, defaultValue)
 
-    fun getString(key: String): String? {
-        return this.getString(key, "")
-    }
+    // 存储字符串
+    fun putString(key: String, value: String, isCommit: Boolean = false) =
+        put(key, value, isCommit)
 
-    fun putInt(key: String, value: Int, isCommit: Boolean) {
-        if (isCommit) {
-            var success = false
-            var attempts = 0
-            while (!success && attempts < MAX_RETRIES) {
-                editor.putInt(key, value)
-                success = editor.commit()
-                if (success) {
-                    MyLog.d(TAG, "Set int value to $value successfully")
-                } else {
-                    MyLog.d(TAG, "Failed to set int value to $value. Attempt ${attempts + 1} of $MAX_RETRIES")
-                }
-                attempts++
-            }
-        } else {
-            editor.putInt(key, value)
-            editor.apply()
-        }
-    }
+    // 获取字符串
+    fun getString(key: String, defaultValue: String = ""): String? =
+        pref.getString(key, defaultValue)
 
-    fun putInt(key: String, value: Int) {
-        this.putInt(key, value, false)
-    }
+    // 存储整数
+    fun putInt(key: String, value: Int, isCommit: Boolean = false) =
+        put(key, value, isCommit)
 
-    fun getInt(key: String, defaultValue: Int): Int {
-        return pref.getInt(key, defaultValue)
-    }
+    // 获取整数
+    fun getInt(key: String, defaultValue: Int = -1): Int =
+        pref.getInt(key, defaultValue)
 
-    fun getInt(key: String): Int {
-        return getInt(key, -1)
-    }
-
-    fun contains(key: String): Boolean {
-        return pref.contains(key)
-    }
+    // 检查是否存在键
+    fun contains(key: String): Boolean =
+        pref.contains(key)
 }

@@ -27,7 +27,7 @@ object FragmentFactory {
         }
         fragment = when (fragmentType) {
             ConstantLogic.MSG_TYPE_SIGN -> SignInFragment()
-
+            ConstantLogic.MSG_TYPE_HOME -> HomeFragment()
             else -> HomeFragment()
         }
         mCacheFragment!![fragmentType] = fragment

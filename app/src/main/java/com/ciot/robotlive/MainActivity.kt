@@ -3,6 +3,7 @@ package com.ciot.robotlive
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.ciot.robotlive.bean.DealResult
@@ -13,6 +14,7 @@ import com.ciot.robotlive.ui.base.BaseFragment
 import com.ciot.robotlive.ui.fragment.ControlFragment
 import com.ciot.robotlive.ui.fragment.FragmentFactory
 import com.ciot.robotlive.ui.fragment.HomeFragment
+import com.ciot.robotlive.utils.ContextUtil
 import com.ciot.robotlive.utils.MyLog
 import com.ciot.robotlive.utils.ToastUtil
 import java.util.LinkedList
@@ -33,6 +35,15 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MyLog.d(TAG, "MainActivity onCreate start")
+        ContextUtil.setContext(this)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        )
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mPresenter?.initSetting()
     }
@@ -138,7 +149,8 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
     }
 
     fun signIn(account: String, password: String) {
-        mPresenter?.signIn(account, password)
+        //mPresenter?.signIn(account, password)
+        mPresenter?.signIn("gcfi9416", "jfEN0hQND")
     }
 }
 

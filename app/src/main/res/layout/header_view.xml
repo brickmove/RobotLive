@@ -5,13 +5,12 @@
 
     <TextView
         android:id="@+id/tv_head_time"
-        android:layout_width="30dp"
+        android:layout_width="40dp"
         android:layout_height="21dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="13dp"
-        android:layout_marginBottom="10dp"
-        android:gravity="center_vertical|end"
-        android:textAlignment="viewEnd"
+        android:gravity="center_vertical|start"
+        android:textAlignment="viewStart"
         android:textColor="@color/white"
         android:text="@string/time"
         android:textSize="15sp" />
@@ -48,9 +47,8 @@
         android:layout_marginStart="163dp"
         android:layout_marginEnd="172dp"
         android:layout_marginTop="56dp"
-        android:layout_marginBottom="0dp"
-        android:gravity="center_vertical|end"
-        android:textAlignment="viewEnd"
+        android:gravity="center_vertical|start"
+        android:textAlignment="viewStart"
         android:textColor="@color/white"
         android:text="@string/hone"
         android:textSize="17sp"
