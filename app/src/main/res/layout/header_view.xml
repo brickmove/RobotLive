@@ -4,7 +4,7 @@
     android:layout_height="80dp">
 
     <TextView
-        android:id="@+id/timeTextView"
+        android:id="@+id/tv_head_time"
         android:layout_width="30dp"
         android:layout_height="21dp"
         android:layout_marginStart="32dp"
@@ -17,7 +17,7 @@
         android:textSize="15sp" />
 
     <ImageView
-        android:id="@+id/signal_img"
+        android:id="@+id/iv_signal"
         android:layout_width="17dp"
         android:layout_height="11dp"
         android:layout_marginStart="294dp"
@@ -25,7 +25,7 @@
         android:layout_marginTop="16dp"
         android:src="@mipmap/signal"/>
     <ImageView
-        android:id="@+id/wifi_img"
+        android:id="@+id/iv_wifi"
         android:layout_width="17dp"
         android:layout_height="11dp"
         android:layout_marginStart="316dp"
@@ -33,7 +33,7 @@
         android:layout_marginTop="16dp"
         android:src="@mipmap/wifi"/>
     <ImageView
-        android:id="@+id/battery_img"
+        android:id="@+id/iv_battery"
         android:layout_width="24dp"
         android:layout_height="11dp"
         android:layout_marginStart="336dp"

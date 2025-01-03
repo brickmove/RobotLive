@@ -14,4 +14,7 @@
     <string name="robot_example">Lete-Robot01</string>
     <string name="robot_location">Location of area shopping malls</string>
     <string name="ctl_button_tx">Control</string>
+    <string name="ctl_remaining_time">Control remaining time</string>
+    <string name="ctl_remaining_timing">00:21:51</string>
+    <string name="Recharge">Recharge</string>
 </resources>

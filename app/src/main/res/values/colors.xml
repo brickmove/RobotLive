@@ -15,4 +15,7 @@
     <color name="robot_control">#ffEBEBF6</color>
     <color name="robot_side">#ffC5C5D1</color>
     <color name="robot_menu_stroke">#ff686872</color>
+    <color name="recharge">#ffFFAD26</color>
+    <color name="recharge_stroke">#ffFFE072</color>
+    <color name="recharge_solid">#ff161622</color>
 </resources>

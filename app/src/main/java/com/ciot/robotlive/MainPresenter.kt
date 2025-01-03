@@ -61,7 +61,7 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
         updateTimeRunnable = object : Runnable {
             override fun run() {
                 val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                binding.headView.timeTextView.text = timeFormat.format(Date())
+                binding.headView.tvHeadTime.text = timeFormat.format(Date())
                 curTimeHandler.postDelayed(this, 1000)
             }
         }
