@@ -11,7 +11,7 @@ import com.ciot.robotlive.constant.ConstantLogic
 import com.ciot.robotlive.databinding.ActivityMainBinding
 import com.ciot.robotlive.ui.base.BaseActivity
 import com.ciot.robotlive.ui.base.BaseFragment
-import com.ciot.robotlive.ui.fragment.ControlFragment
+import com.ciot.robotlive.ui.fragment.LiveFragment
 import com.ciot.robotlive.ui.fragment.FragmentFactory
 import com.ciot.robotlive.ui.fragment.HomeFragment
 import com.ciot.robotlive.utils.ContextUtil
@@ -76,6 +76,11 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
         updateFragment(ConstantLogic.MSG_TYPE_HOME, mPresenter?.getHomeData())
     }
 
+    fun showLive() {
+        MyLog.d(TAG, "MainActivity showHome >>>>>>>>>")
+        updateFragment(ConstantLogic.MSG_TYPE_LIVE, mPresenter?.getHomeData())
+    }
+
     private fun initListener() {
         binding.headView.ivReturn.setOnClickListener(this)
     }
@@ -85,7 +90,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
             binding.headView.ivReturn -> {
                 if (currentfragment is HomeFragment) {
                     showSign()
-                } else if (currentfragment is ControlFragment) {
+                } else if (currentfragment is LiveFragment) {
                     showHome()
                 }
             }
@@ -135,7 +140,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
     private fun setHeadView(type: Int) {
         when (type) {
             ConstantLogic.MSG_TYPE_HOME,
-            ConstantLogic.MSG_TYPE_CONTROL-> {
+            ConstantLogic.MSG_TYPE_LIVE-> {
                 binding.headView.ivReturn.visibility = View.VISIBLE
                 binding.headView.tvRobotControl.visibility = View.VISIBLE
                 binding.headView.tvHome.visibility = View.GONE

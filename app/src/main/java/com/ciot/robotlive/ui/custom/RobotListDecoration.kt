@@ -14,11 +14,11 @@ class RobotListDecoration(private val verticalSpaceHeight: Int, private val hori
         super.getItemOffsets(outRect, view, parent, state)
 
         val position = parent.getChildAdapterPosition(view)
-        if (position != 0) { // Skip the first item
+        if (position == 0) { // Skip the first item
             outRect.top = 22
         } else {
             outRect.top = verticalSpaceHeight
         }
-        outRect.bottom = 0
+        outRect.bottom = verticalSpaceHeight
     }
 }

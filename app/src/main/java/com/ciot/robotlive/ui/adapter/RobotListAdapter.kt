@@ -31,7 +31,8 @@ class RobotListAdapter(private val context: Context, private val robotData: List
     }
 
     override fun onBindViewHolder(holder: RobotListAdapter.RobotListViewHolder, position: Int) {
-        holder.robotId.text = robotData[position].id
+        holder.robotId.text = robotData[position].name
+        holder.location.text = robotData[position].id
         holder.ctlButton.setOnClickListener(object : CustomClickListener() {
             override fun onSingleClick(v: View) {
                 ctlButtonClickListener?.onCtlClick(holder.adapterPosition)

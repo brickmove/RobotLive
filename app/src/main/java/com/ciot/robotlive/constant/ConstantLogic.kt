@@ -18,7 +18,7 @@ interface ConstantLogic {
         // fragment
         const val MSG_TYPE_HOME = 0 // 主页
         const val MSG_TYPE_SIGN = 1 // 登录页面
-        const val MSG_TYPE_CONTROL = 2 // 控制界面
+        const val MSG_TYPE_LIVE = 2 // 直播界面
 
         // Event bus constant
         const val EVENT_ARRIVED_POINT = "EVENT_ARRIVED_POINT" // 到达点位

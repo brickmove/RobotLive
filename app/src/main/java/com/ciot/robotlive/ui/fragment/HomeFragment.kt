@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.GsonUtils
+import com.ciot.robotlive.MainActivity
 import com.ciot.robotlive.bean.DealResult
 import com.ciot.robotlive.bean.RobotData
 import com.ciot.robotlive.databinding.FragmentHomeBinding
@@ -15,6 +16,7 @@ import com.ciot.robotlive.ui.base.BaseFragment
 import com.ciot.robotlive.ui.custom.MenuListDecoration
 import com.ciot.robotlive.ui.custom.RobotDiffCallback
 import com.ciot.robotlive.ui.custom.RobotListDecoration
+import com.ciot.robotlive.utils.ContextUtil
 import com.ciot.robotlive.utils.MyLog
 
 class HomeFragment : BaseFragment() {
@@ -35,7 +37,13 @@ class HomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initView()
         initListener()
+    }
+
+    private fun initView() {
+        menuListRecycleView = binding.rvHomeMenu
+        robotListRecyclerView = binding.rvRobotList
     }
 
     private fun initListener() {
@@ -51,9 +59,9 @@ class HomeFragment : BaseFragment() {
 
     private fun initRobotListAdapter() {
         mDataList.clear()
-        robotListAdapter = RobotListAdapter(activity?.applicationContext!!, mDataList)
+        robotListAdapter = RobotListAdapter(ContextUtil.getContext(), mDataList)
         robotListRecyclerView?.adapter = robotListAdapter
-        val spaceItemDecoration = RobotListDecoration(0, 30)
+        val spaceItemDecoration = RobotListDecoration(30, 0)
         robotListRecyclerView?.addItemDecoration(spaceItemDecoration)
         robotListAdapter?.setCtlButtonClickListener(object : RobotListAdapter.OnCtlClickListener{
             override fun onCtlClick(position: Int) {
@@ -63,14 +71,14 @@ class HomeFragment : BaseFragment() {
                 }
                 val robotId = mDataList[position].id
                 // 进入视频监控页面
-
+                (activity as MainActivity).showLive()
             }
         })
     }
 
     private fun initMenuListAdapter() {
         mDataList.clear()
-        menuListAdapter = MenuListAdapter(activity?.applicationContext!!, mDataList)
+        menuListAdapter = MenuListAdapter(ContextUtil.getContext(), mDataList)
         menuListRecycleView?.adapter = menuListAdapter
         val spaceItemDecoration = MenuListDecoration(0, 11)
         menuListRecycleView?.addItemDecoration(spaceItemDecoration)
