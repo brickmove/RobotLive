@@ -76,9 +76,9 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
         updateFragment(ConstantLogic.MSG_TYPE_HOME, mPresenter?.getHomeData())
     }
 
-    fun showLive() {
+    fun showLive(id: String) {
         MyLog.d(TAG, "MainActivity showHome >>>>>>>>>")
-        updateFragment(ConstantLogic.MSG_TYPE_LIVE, mPresenter?.getHomeData())
+        updateFragment(ConstantLogic.MSG_TYPE_LIVE, mPresenter?.getLiveData(id))
     }
 
     private fun initListener() {

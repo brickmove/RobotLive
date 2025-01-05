@@ -71,7 +71,9 @@ class HomeFragment : BaseFragment() {
                 }
                 val robotId = mDataList[position].id
                 // 进入视频监控页面
-                (activity as MainActivity).showLive()
+                if (robotId != null) {
+                    (activity as MainActivity).showLive(robotId)
+                }
             }
         })
     }

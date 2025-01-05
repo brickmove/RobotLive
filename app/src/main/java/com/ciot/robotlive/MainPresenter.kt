@@ -160,6 +160,14 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
         return dealResult
     }
 
+    // 获取监控页需要的数据
+    fun getLiveData(id: String): DealResult {
+        val dealResult = DealResult()
+        dealResult.type = ConstantLogic.MSG_TYPE_LIVE
+        dealResult.selectRobotId = id
+        return dealResult
+    }
+
     // 设置默认服务器
     private fun setDefaultServer() {
         if (SPUtils.getString(ConstantLogic.SP_BIND_SERVER).isNullOrEmpty()) {
