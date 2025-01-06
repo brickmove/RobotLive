@@ -19,6 +19,7 @@ import com.ciot.robotlive.network.tcp.TcpClient
 import com.ciot.robotlive.network.tcp.TcpMsgListener
 import com.ciot.robotlive.utils.Security
 import com.ciot.robotlive.utils.MyLog
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -249,6 +250,72 @@ class RetrofitManager {
             robotData.name = it.name
             mRobotData!!.add(robotData)
         }
+    }
+
+    fun buildBody(id: String, direction: String): RequestBody {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("id", id)
+        jsonObject.addProperty("direction", direction)
+        return RequestBody.create(
+            "application/json; charset=utf-8".toMediaTypeOrNull(),
+            jsonObject.toString()
+        )
+    }
+
+    fun startMove(id: String, direction: String) {
+        val token = getToken()
+        if (token.isNullOrEmpty()) {
+            MyLog.e(TAG, "startMove param err--->token: $token")
+            return
+        }
+        getWuHanApiService().robotStartMove(token, buildBody(id, direction))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: Observer<ResponseBody>{
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onNext(body: ResponseBody) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.w(TAG,"startMove onError: ${e.message}")
+                }
+
+                override fun onComplete() {
+
+                }
+            })
+    }
+
+    fun stopMove(id: String, direction: String) {
+        val token = getToken()
+        if (token.isNullOrEmpty()) {
+            MyLog.e(TAG, "stopMove param err--->token: $token")
+            return
+        }
+        getWuHanApiService().robotStopMove(token, buildBody(id, direction))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: Observer<ResponseBody>{
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onNext(body: ResponseBody) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.w(TAG,"stopMove onError: ${e.message}")
+                }
+
+                override fun onComplete() {
+
+                }
+            })
     }
 
     /**

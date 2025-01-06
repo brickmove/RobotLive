@@ -6,6 +6,6 @@
         <!--方向键（4向）-->
         <com.ciot.robotlive.ui.widgets.DirectionFourKey
             android:id="@+id/main_direction_four_rv"
-            android:layout_width="160dp"
-            android:layout_height="160dp" />
+            android:layout_width="124dp"
+            android:layout_height="124dp" />
 </RelativeLayout>

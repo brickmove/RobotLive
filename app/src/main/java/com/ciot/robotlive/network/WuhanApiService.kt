@@ -30,4 +30,14 @@ interface WuhanApiService {
                            @Query("start") start: String?,
                            @Query("limit") limit: String?,
     ): Observable<RobotAllResponse>
+
+    /*机器人运动*/
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
+    @POST("/api/Robots/ctrl/move")
+    fun robotStartMove(@Query("access_token") token: String?, @Body body: RequestBody?): Observable<ResponseBody>
+
+    /*机器人停止运动*/
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
+    @POST("/api/Robots/ctrl/stop")
+    fun robotStopMove(@Query("access_token") token: String?,@Body body: RequestBody?): Observable<ResponseBody>
 }

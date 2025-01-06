@@ -11,8 +11,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.ciot.robotlive.bean.DealResult
 import com.ciot.robotlive.databinding.FragmentLiveBinding
+import com.ciot.robotlive.network.RetrofitManager
 import com.ciot.robotlive.ui.base.BaseFragment
 import com.ciot.robotlive.ui.viewmodel.CountdownViewModel
+import com.ciot.robotlive.ui.widgets.DirectionFourKey
 import com.ciot.robotlive.utils.MyLog
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -22,6 +24,10 @@ import java.util.concurrent.TimeUnit
 class LiveFragment : BaseFragment() {
     companion object {
         private const val TAG = "LiveFragment"
+        private const val UP = "forward"
+        private const val DOWN = "backward"
+        private const val LEFT = "left"
+        private const val RIGHT = "right"
     }
     private lateinit var binding : FragmentLiveBinding
     private var wvLive: WebView? = null
@@ -29,6 +35,7 @@ class LiveFragment : BaseFragment() {
     private var btRecharge: Button? = null
     private var ibVoiceInput: ImageButton? = null
     private var ibVoiceOutput: ImageButton? = null
+    private var directionFourKey: DirectionFourKey? = null
     private var mRemainTime: String = "12:00:00"
     private lateinit var countdownViewModel: CountdownViewModel
     private var mRobotId: String? = null
@@ -60,6 +67,7 @@ class LiveFragment : BaseFragment() {
         btRecharge = binding.btRecharge
         ibVoiceInput = binding.btVoiceInput
         ibVoiceOutput = binding.btVoiceOutput
+        directionFourKey = binding.includeDirectionControl.mainDirectionFourRv
     }
 
     private fun initViewModel() {
@@ -73,10 +81,11 @@ class LiveFragment : BaseFragment() {
                 updateCountdownText(it.remainingTime)
             }
         })
+        directionFourKey?.setOnDirectionListener(onDirectionListener)
     }
 
     private fun updateCountdownText(millisUntilFinished: Long) {
-        MyLog.d(TAG, "updateCountdownText: $millisUntilFinished")
+        //MyLog.d(TAG, "updateCountdownText: $millisUntilFinished")
         val hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) -
                 TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished))
@@ -139,5 +148,41 @@ class LiveFragment : BaseFragment() {
         val seconds = parts[2]
 
         return hours * 3600 + minutes * 60 + seconds
+    }
+
+    //四建摇杆控制
+    private val onDirectionListener: DirectionFourKey.OnDirectionListener = object :
+        DirectionFourKey.OnDirectionListener {
+            override fun upUp() {
+                mRobotId?.let { RetrofitManager.instance.stopMove(it, UP) }
+            }
+
+            override fun downUp() {
+                mRobotId?.let { RetrofitManager.instance.stopMove(it, DOWN) }
+            }
+
+            override fun leftUp() {
+                mRobotId?.let { RetrofitManager.instance.stopMove(it, LEFT) }
+            }
+
+            override fun rightUp() {
+                mRobotId?.let { RetrofitManager.instance.stopMove(it, RIGHT) }
+            }
+
+            override fun upDown() {
+                mRobotId?.let { RetrofitManager.instance.startMove(it, UP) }
+            }
+
+            override fun downDown() {
+                mRobotId?.let { RetrofitManager.instance.startMove(it, DOWN) }
+            }
+
+            override fun leftDown() {
+                mRobotId?.let { RetrofitManager.instance.startMove(it, LEFT) }
+            }
+
+            override fun rightDown() {
+                mRobotId?.let { RetrofitManager.instance.startMove(it, RIGHT) }
+            }
     }
 }

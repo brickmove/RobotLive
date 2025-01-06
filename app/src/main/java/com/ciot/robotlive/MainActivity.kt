@@ -11,9 +11,10 @@ import com.ciot.robotlive.constant.ConstantLogic
 import com.ciot.robotlive.databinding.ActivityMainBinding
 import com.ciot.robotlive.ui.base.BaseActivity
 import com.ciot.robotlive.ui.base.BaseFragment
-import com.ciot.robotlive.ui.fragment.LiveFragment
 import com.ciot.robotlive.ui.fragment.FragmentFactory
 import com.ciot.robotlive.ui.fragment.HomeFragment
+import com.ciot.robotlive.ui.fragment.LiveFragment
+import com.ciot.robotlive.ui.widgets.DirectionFourKey
 import com.ciot.robotlive.utils.ContextUtil
 import com.ciot.robotlive.utils.MyLog
 import com.ciot.robotlive.utils.ToastUtil
