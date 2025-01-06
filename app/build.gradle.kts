@@ -1,3 +1,7 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -12,8 +16,10 @@ android {
         applicationId = "com.ciot.robotlive"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+
+        versionName = "V1.0.0"
+        val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        versionCode = Integer.parseInt(dateFormat.format(Date()))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -47,6 +53,14 @@ android {
 
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    }
+
+    applicationVariants.all {
+        outputs.all {
+            if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
+                outputFileName = "RobotLive_${versionName}_${versionCode}_beta.apk"
+            }
+        }
     }
 }
 
