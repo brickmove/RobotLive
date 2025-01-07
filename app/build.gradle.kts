@@ -92,6 +92,8 @@ dependencies {
     implementation(libs.eventbus)
     implementation(libs.material)
     implementation(libs.androidx.room.runtime)
+    implementation(files("libs/pgliblivemulti.jar"))
+    implementation(files("libs/pgjniplugin.jar"))
     kapt(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
