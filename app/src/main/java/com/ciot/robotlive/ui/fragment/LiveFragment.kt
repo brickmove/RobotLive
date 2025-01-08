@@ -3,9 +3,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,12 +13,10 @@ import com.ciot.robotlive.bean.DealResult
 import com.ciot.robotlive.databinding.FragmentLiveBinding
 import com.ciot.robotlive.network.RetrofitManager
 import com.ciot.robotlive.ui.base.BaseFragment
+import com.ciot.robotlive.ui.pglive.PgLiveManager
 import com.ciot.robotlive.ui.viewmodel.CountdownViewModel
 import com.ciot.robotlive.ui.widgets.DirectionFourKey
 import com.ciot.robotlive.utils.MyLog
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class LiveFragment : BaseFragment() {
@@ -30,7 +28,7 @@ class LiveFragment : BaseFragment() {
         private const val RIGHT = "right"
     }
     private lateinit var binding : FragmentLiveBinding
-    private var wvLive: WebView? = null
+    private var wvLive: LinearLayout? = null
     private var tvRemainTime: TextView? = null
     private var btRecharge: Button? = null
     private var ibVoiceInput: ImageButton? = null
@@ -39,6 +37,8 @@ class LiveFragment : BaseFragment() {
     private var mRemainTime: String = "12:00:00"
     private lateinit var countdownViewModel: CountdownViewModel
     private var mRobotId: String? = null
+    private var mVideoCode: String? = null
+    private var mChannel: Int? = null
     private var savedState: Bundle? = null
 
     override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View {
@@ -68,6 +68,7 @@ class LiveFragment : BaseFragment() {
         ibVoiceInput = binding.btVoiceInput
         ibVoiceOutput = binding.btVoiceOutput
         directionFourKey = binding.includeDirectionControl.mainDirectionFourRv
+        PgLiveManager.instance.initView(wvLive!!)
     }
 
     private fun initViewModel() {
@@ -114,7 +115,9 @@ class LiveFragment : BaseFragment() {
     override fun refreshData(isRefreshImmediately: Boolean, data: DealResult) {
         super.refreshData(isRefreshImmediately, data)
         mRobotId = data.selectRobotId
+        mVideoCode = data.videoCode
         setupCountdown()
+        mVideoCode?.let { PgLiveManager.instance.liveConnect(it, 1) }
     }
 
     private fun setupCountdown() {
@@ -184,5 +187,17 @@ class LiveFragment : BaseFragment() {
             override fun rightDown() {
                 mRobotId?.let { RetrofitManager.instance.startMove(it, RIGHT) }
             }
+    }
+
+    private fun stopLive() {
+        PgLiveManager.instance.liveLogout()
+        mRobotId?.let { RetrofitManager.instance.stopLive(it) }
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            stopLive()
+        }
     }
 }

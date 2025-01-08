@@ -15,4 +15,9 @@ class RobotData {
 
     // 设备连接状态
     var link: Boolean = false
+
+    // 机器人账户
+    var user: String? = null
+
+    var videoCode: String? = null
 }

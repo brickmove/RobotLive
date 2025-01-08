@@ -5,24 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<!--    <TextView-->
-<!--        android:id="@+id/tv_home"-->
-<!--        android:layout_width="40dp"-->
-<!--        android:layout_height="24dp"-->
-<!--        android:layout_marginStart="163dp"-->
-<!--        android:layout_marginEnd="172dp"-->
-<!--        android:layout_marginTop="12dp"-->
-<!--        android:layout_marginBottom="732dp"-->
-<!--        android:gravity="center_vertical|end"-->
-<!--        android:textAlignment="viewEnd"-->
-<!--        android:textColor="@color/white"-->
-<!--        android:text="@string/hone"-->
-<!--        android:textSize="17sp"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        />-->
-
     <TextView
         android:id="@+id/tv_welcome_back"
         android:layout_width="201dp"

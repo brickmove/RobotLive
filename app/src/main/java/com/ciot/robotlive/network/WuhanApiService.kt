@@ -1,6 +1,9 @@
 package com.ciot.robotlive.network
 
+import com.ciot.robotlive.bean.GetVideoResponse
 import com.ciot.robotlive.bean.RobotAllResponse
+import com.ciot.robotlive.bean.StartPlayRequest
+import com.ciot.robotlive.bean.StartPlayResponse
 import io.reactivex.Observable
 import me.jessyan.retrofiturlmanager.RetrofitUrlManager
 import okhttp3.RequestBody
@@ -40,4 +43,27 @@ interface WuhanApiService {
     @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
     @POST("/api/Robots/ctrl/stop")
     fun robotStopMove(@Query("access_token") token: String?,@Body body: RequestBody?): Observable<ResponseBody>
+
+    /*获取视频激活码*/
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
+    @GET("/api/Videos/findVideoByAccount")
+    fun getVideoCode(@Query("access_token") token: String?,@Query("account") account: String?): Observable<GetVideoResponse>
+
+    /*开启直播*/
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
+    @POST("/api/Robots/play/startPlay")
+    fun robotStartLive(@Query("access_token") token: String?,
+                       @Query("id") id: String?,
+                       @Query("channel") channel: Int?,
+                       @Query("client") client: String?,
+                       @Query("mode") mode: Int?,
+                       ): Observable<StartPlayResponse>
+
+    /*关闭直播*/
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
+    @POST("/api/Robots/play/stopPlay")
+    fun robotStopLive(@Query("access_token") token: String?,
+                      @Query("id") id: String?,
+                      @Query("handle") handle: String?,
+                      ): Observable<ResponseBody>
 }

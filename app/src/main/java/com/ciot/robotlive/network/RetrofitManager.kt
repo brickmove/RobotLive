@@ -7,9 +7,11 @@ import android.text.TextUtils
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.ciot.robotlive.bean.AllowResponse
+import com.ciot.robotlive.bean.GetVideoResponse
 import com.ciot.robotlive.bean.RobotAllResponse
 import com.ciot.robotlive.bean.RobotData
 import com.ciot.robotlive.bean.RobotInfoResponse
+import com.ciot.robotlive.bean.StartPlayResponse
 import com.ciot.robotlive.constant.ConstantLogic
 import com.ciot.robotlive.constant.NetConstant
 import com.ciot.robotlive.network.interceptor.HttpLoggingInterceptor
@@ -17,11 +19,12 @@ import com.ciot.robotlive.network.interceptor.TokenInterceptor
 import com.ciot.robotlive.network.tcp.RetryWithDelay
 import com.ciot.robotlive.network.tcp.TcpClient
 import com.ciot.robotlive.network.tcp.TcpMsgListener
-import com.ciot.robotlive.utils.Security
 import com.ciot.robotlive.utils.MyLog
+import com.ciot.robotlive.utils.Security
 import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.Observer
+import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -31,7 +34,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -66,6 +68,7 @@ class RetrofitManager {
     private var defaultServer: AtomicReference<String> = AtomicReference()
     private var tcpIp: AtomicReference<String> = AtomicReference()
     private var tcpPort: AtomicReference<Int> = AtomicReference()
+    private var viewHandle: AtomicReference<String> = AtomicReference()
 
     @Volatile
     private var mNidMap: MutableMap<String, String>? = HashMap()
@@ -179,48 +182,6 @@ class RetrofitManager {
         })
     }
 
-    private var getRobotsRetryCount: Int = 1
-    fun getRobotsForHome() {
-        val token = getToken()
-        val project = getProject()
-        if (token.isNullOrEmpty() || project.isNullOrEmpty()) {
-            MyLog.e(TAG, "getRobotsForHome param err--->token: $token, project: $project")
-            return
-        }
-        val start ="0"
-        val limit ="100"
-        //MyLog.d(TAG, "getRobotsForHome param--->token: $token, project: $project")
-        getWuHanApiService().findRobotByProject(token, project, start, limit)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object:Observer<RobotAllResponse>{
-                override fun onSubscribe(d: Disposable) {
-                    addSubscription(d)
-                }
-
-                override fun onNext(body: RobotAllResponse) {
-                    MyLog.d(TAG, "RobotAllResponse: " + GsonUtils.toJson(body))
-                    parseRobotAllResponseBody(body)
-                }
-
-                override fun onError(e: Throwable) {
-                    MyLog.w(TAG,"getRobotsForHome onError: ${e.message}")
-                    if (getRobotsRetryCount <= 5) {
-                        ThreadUtils.getMainHandler().postDelayed({
-                            getRobotsForHome()
-                        }, 500)
-                    } else {
-                        MyLog.e(TAG, " get robot info err count: $getRobotsRetryCount")
-                    }
-                    getRobotsRetryCount++
-                }
-
-                override fun onComplete() {
-
-                }
-            })
-    }
-
     fun getRobotAll(): Observable<RobotAllResponse>? {
         val token = getToken()
         val project = getProject()
@@ -237,22 +198,63 @@ class RetrofitManager {
         val res: RobotAllResponse = body
         val total: Int? = res.total
         val robotInfo: List<RobotInfoResponse>? = res.datas
-        mRobotId = mutableListOf()
         mRobotData = mutableListOf()
         if (total == null || total == 0 || robotInfo.isNullOrEmpty()) {
             MyLog.d(TAG, "parseRobotAllResponseBody robotInfo is empty............")
             return
         }
-        robotInfo.forEach {
-            val robotData = RobotData()
-            robotData.id = it.id
-            robotData.link = it.link == true
-            robotData.name = it.name
-            mRobotData!!.add(robotData)
+
+        val token = getToken()
+        if (token.isNullOrEmpty()) {
+            MyLog.e(TAG, "parseRobotAllResponseBody param err--->token: $token")
+            return
         }
+        val observables = mutableListOf<Observable<GetVideoResponse>>()
+        for (robot in robotInfo) {
+            val observable = getWuHanApiService().getVideoCode(token, robot.user)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+            observables.add(observable)
+        }
+
+        Observable.merge(observables)
+            .toList()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<List<GetVideoResponse>> {
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.e(TAG,"getVideoCode onError: ${e.message}")
+                }
+
+                override fun onSuccess(response: List<GetVideoResponse>) {
+                    MyLog.d(TAG,"getVideoCode onSuccess: " + GsonUtils.toJson(response))
+                    response.forEach { res->
+                        val robotData = RobotData()
+                        robotInfo.forEach {
+                            robotData.id = it.id
+                            robotData.link = it.link == true
+                            robotData.name = it.name
+                            robotData.user = it.user
+                            if (robotData.id == res.id) {
+                                robotData.videoCode = res.value
+                            }
+                        }
+                        mRobotData!!.add(robotData)
+                    }
+                }
+            })
     }
 
-    fun buildBody(id: String, direction: String): RequestBody {
+    fun parseLiveResponseBody(body: StartPlayResponse) {
+        val res: StartPlayResponse = body
+        res.handler?.let { setViewHandle(it) }
+    }
+
+    private fun buildBody(id: String, direction: String): RequestBody {
         val jsonObject = JsonObject()
         jsonObject.addProperty("id", id)
         jsonObject.addProperty("direction", direction)
@@ -310,6 +312,44 @@ class RetrofitManager {
 
                 override fun onError(e: Throwable) {
                     MyLog.w(TAG,"stopMove onError: ${e.message}")
+                }
+
+                override fun onComplete() {
+
+                }
+            })
+    }
+
+    fun startLive(id: String, channel: Int, client: String, mode: Int): Observable<StartPlayResponse>? {
+        val token = getToken()
+        if (token.isNullOrEmpty()) {
+            MyLog.e(TAG, "startLive param err--->token: $token")
+            return null
+        }
+
+        return getWuHanApiService().robotStartLive(token, id, channel, client, mode)
+    }
+
+    fun stopLive(id: String) {
+        val token = getToken()
+        if (token.isNullOrEmpty()) {
+            MyLog.e(TAG, "stopLive param err--->token: $token")
+            return
+        }
+        getWuHanApiService().robotStopLive(token, id, viewHandle.get())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: Observer<ResponseBody>{
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onNext(body: ResponseBody) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.w(TAG,"stopLive onError: ${e.message}")
                 }
 
                 override fun onComplete() {
@@ -637,6 +677,14 @@ class RetrofitManager {
         return tcpClient
     }
 
+    fun getViewHandle(): String? {
+        return viewHandle.get()
+    }
+
+    fun setViewHandle(handle: String) {
+        return viewHandle.set(handle)
+    }
+
     fun onUnsubscribe() {
         if (mCompositeDisposable != null) {
             mCompositeDisposable!!.clear()
@@ -649,6 +697,4 @@ class RetrofitManager {
         }
         disposable?.let { mCompositeDisposable?.add(it) }
     }
-
-
 }

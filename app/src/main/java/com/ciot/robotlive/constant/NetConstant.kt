@@ -17,6 +17,11 @@ object NetConstant {
     var US_SERVICE_URL = "http://$IP_US:9899/"
     var HK_SERVICE_URL = "http://$IP_HK:9899/"
 
+    var PG_LIVE_SERVER_ADDRESS = "47.92.208.185:7781"
+    var PG_LIVE_REPLAY_ADDRESS = "47.92.208.185:443"
+    var PG_LIVE_PEER_USER = "ANDROID_DEMO"
+    var PG_LIVE_PEER_PWD = "123456"
+
     /*武汉服务器初始化状态*/
     //0表示获取到TCP长连接的IP;1表示激活成功获取到账户和密码;2表示登录成功;3表示获取到token;4表示获取到projectId等属性信息
     const val INIT_STATE_IDLE = -1

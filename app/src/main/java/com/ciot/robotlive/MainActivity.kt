@@ -1,5 +1,6 @@
 package com.ciot.robotlive
 
+import android.Manifest
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import com.ciot.robotlive.ui.base.BaseFragment
 import com.ciot.robotlive.ui.fragment.FragmentFactory
 import com.ciot.robotlive.ui.fragment.HomeFragment
 import com.ciot.robotlive.ui.fragment.LiveFragment
+import com.ciot.robotlive.ui.pglive.MyPermission
 import com.ciot.robotlive.ui.widgets.DirectionFourKey
 import com.ciot.robotlive.utils.ContextUtil
 import com.ciot.robotlive.utils.MyLog
@@ -28,6 +30,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
     lateinit var binding : ActivityMainBinding
     private var currentfragment: BaseFragment? = null
     private var showingFragment: Fragment? = null
+    private var mPermission: MyPermission? = null
 
     override fun createPresent(): MainPresenter {
         return MainPresenter(this@MainActivity)
@@ -45,6 +48,11 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
+
+        val sPermList = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val sTextList = arrayOf("麦克风", "写存储")
+        mPermission = MyPermission()
+        mPermission!!.Request(this, sPermList, sTextList)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mPresenter?.initSetting()
     }
@@ -77,9 +85,9 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
         updateFragment(ConstantLogic.MSG_TYPE_HOME, mPresenter?.getHomeData())
     }
 
-    fun showLive(id: String) {
+    fun showLive(id: String, videoCode: String) {
         MyLog.d(TAG, "MainActivity showHome >>>>>>>>>")
-        updateFragment(ConstantLogic.MSG_TYPE_LIVE, mPresenter?.getLiveData(id))
+        mPresenter?.startRobotLive(id, videoCode)
     }
 
     private fun initListener() {
@@ -98,7 +106,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
         }
     }
 
-    private fun updateFragment(type: Int, result: DealResult?) {
+    fun updateFragment(type: Int, result: DealResult?) {
         getFragment(type)
         changeFragment(type, currentfragment)
         setHeadView(type)
@@ -158,5 +166,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
         //mPresenter?.signIn(account, password)
         mPresenter?.signIn("gcfi9416", "jfEN0hQND")
     }
+
+
 }
 

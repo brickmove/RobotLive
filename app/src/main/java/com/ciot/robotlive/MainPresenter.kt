@@ -7,6 +7,8 @@ import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.ciot.robotlive.bean.DealResult
 import com.ciot.robotlive.bean.RobotAllResponse
+import com.ciot.robotlive.bean.StartPlayRequest
+import com.ciot.robotlive.bean.StartPlayResponse
 import com.ciot.robotlive.constant.ConstantLogic
 import com.ciot.robotlive.constant.NetConstant
 import com.ciot.robotlive.databinding.ActivityMainBinding
@@ -152,19 +154,51 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
             })
     }
 
+    var startLiveRetry = 0
+    fun startRobotLive(id: String, videoCode: String) {
+        val channel = 1
+        val client = System.currentTimeMillis().toString()
+        val mode = 1
+        RetrofitManager.instance.startLive(id, channel, client, mode)
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe(object:Observer<StartPlayResponse>{
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onNext(body: StartPlayResponse) {
+                    MyLog.d(TAG, "RobotLiveResponse: " + GsonUtils.toJson(body))
+                    RetrofitManager.instance.parseLiveResponseBody(body)
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.w(TAG,"startLive onError: ${e.message}")
+                    if (startLiveRetry <= 5) {
+                        ThreadUtils.getMainHandler().postDelayed({
+                            startRobotLive(id, videoCode)
+                        }, 500)
+                    } else {
+                        MyLog.e(TAG, " start robot live err count: $startLiveRetry")
+                    }
+                    startLiveRetry++
+                }
+
+                override fun onComplete() {
+                    val dealResult = DealResult()
+                    dealResult.type = ConstantLogic.MSG_TYPE_LIVE
+                    dealResult.selectRobotId = id
+                    dealResult.videoCode = videoCode
+                    view.updateFragment(ConstantLogic.MSG_TYPE_LIVE, dealResult)
+                }
+            })
+    }
+
     // 获取首页需要的数据
     fun getHomeData(): DealResult {
         val dealResult = DealResult()
         dealResult.type = ConstantLogic.MSG_TYPE_HOME
         dealResult.robotInfoList = RetrofitManager.instance.getRobotData()
-        return dealResult
-    }
-
-    // 获取监控页需要的数据
-    fun getLiveData(id: String): DealResult {
-        val dealResult = DealResult()
-        dealResult.type = ConstantLogic.MSG_TYPE_LIVE
-        dealResult.selectRobotId = id
         return dealResult
     }
 
