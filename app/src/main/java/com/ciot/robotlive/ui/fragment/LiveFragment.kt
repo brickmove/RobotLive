@@ -116,6 +116,7 @@ class LiveFragment : BaseFragment() {
         super.refreshData(isRefreshImmediately, data)
         mRobotId = data.selectRobotId
         mVideoCode = data.videoCode
+        MyLog.d(TAG, "refreshData mRobotId: $mRobotId, mVideoCode: $mVideoCode")
         setupCountdown()
         mVideoCode?.let { PgLiveManager.instance.liveConnect(it, 1) }
     }
@@ -198,6 +199,8 @@ class LiveFragment : BaseFragment() {
         super.onHiddenChanged(hidden)
         if (hidden) {
             stopLive()
+        } else {
+            PgLiveManager.instance.initView(wvLive!!)
         }
     }
 }

@@ -21,7 +21,6 @@ interface ConstantLogic {
         const val MSG_TYPE_LIVE = 2 // 直播界面
 
         // Event bus constant
-        const val EVENT_ARRIVED_POINT = "EVENT_ARRIVED_POINT" // 到达点位
         const val EVENT_SHOW_HOME = "EVENT_SHOW_HOME"         // 显示首页
         const val EVENT_REFRESH_HOME = "EVENT_REFRESH_HOME"   // 刷新首页
         const val EVENT_RECONNECT_TCP = "EVENT_RECONNECT_TCP" // 重连tcp

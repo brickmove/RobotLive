@@ -33,6 +33,9 @@ class RobotListAdapter(private val context: Context, private val robotData: List
     override fun onBindViewHolder(holder: RobotListAdapter.RobotListViewHolder, position: Int) {
         holder.robotId.text = robotData[position].name
         holder.location.text = robotData[position].id
+        if (!robotData[position].link) {
+            holder.ivOnline.visibility = View.INVISIBLE
+        }
         holder.ctlButton.setOnClickListener(object : CustomClickListener() {
             override fun onSingleClick(v: View) {
                 ctlButtonClickListener?.onCtlClick(holder.adapterPosition)
@@ -44,6 +47,7 @@ class RobotListAdapter(private val context: Context, private val robotData: List
         val robotId: TextView = itemView.findViewById(R.id.tv_robot_id)
         val location: TextView = itemView.findViewById(R.id.tv_robot_location)
         val ctlButton: Button = itemView.findViewById(R.id.bt_ctl)
+        val ivOnline: ImageView = itemView.findViewById(R.id.iv_Online)
     }
 
     interface OnCtlClickListener {

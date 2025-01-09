@@ -1,5 +1,6 @@
 package com.ciot.robotlive
 
+import android.Manifest
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -7,13 +8,13 @@ import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.ciot.robotlive.bean.DealResult
 import com.ciot.robotlive.bean.RobotAllResponse
-import com.ciot.robotlive.bean.StartPlayRequest
 import com.ciot.robotlive.bean.StartPlayResponse
 import com.ciot.robotlive.constant.ConstantLogic
 import com.ciot.robotlive.constant.NetConstant
 import com.ciot.robotlive.databinding.ActivityMainBinding
 import com.ciot.robotlive.network.RetrofitManager
 import com.ciot.robotlive.ui.base.BasePresenter
+import com.ciot.robotlive.ui.pglive.MyPermission
 import com.ciot.robotlive.utils.MyLog
 import com.ciot.robotlive.utils.SPUtils
 import io.reactivex.Observer
@@ -35,25 +36,25 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
     companion object {
         private const val TAG = "MainPresenter"
     }
-    var mBundle: Bundle? = null
-    private var mContext: Context? = null
     var data: LinkedList<DealResult>? = null
         private set
 
-    init {
-        initListener()
-    }
-
-    private fun initListener() {
-
-    }
-
+    private var mPermission: MyPermission? = null
     fun initSetting() {
+        initPermission()
         setDefaultServer()
         getCurTime(view.binding)
         if (!SPUtils.getBoolean(ConstantLogic.SP_IS_SIGNED_IN, false)) {
             view.showSign()
         }
+    }
+
+    private fun initPermission() {
+        val sPermList = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val sTextList = arrayOf("麦克风", "写存储")
+        mPermission = MyPermission()
+        mPermission!!.Request(view, sPermList, sTextList)
+
     }
 
     // 自动对时
@@ -149,7 +150,7 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
                 }
 
                 override fun onComplete() {
-                    view.showHome()
+
                 }
             })
     }
@@ -174,7 +175,7 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
 
                 override fun onError(e: Throwable) {
                     MyLog.w(TAG,"startLive onError: ${e.message}")
-                    if (startLiveRetry <= 5) {
+                    if (startLiveRetry <= 3) {
                         ThreadUtils.getMainHandler().postDelayed({
                             startRobotLive(id, videoCode)
                         }, 500)
@@ -199,6 +200,7 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
         val dealResult = DealResult()
         dealResult.type = ConstantLogic.MSG_TYPE_HOME
         dealResult.robotInfoList = RetrofitManager.instance.getRobotData()
+        MyLog.d(TAG, "getHomeData: " + GsonUtils.toJson(dealResult.robotInfoList))
         return dealResult
     }
 

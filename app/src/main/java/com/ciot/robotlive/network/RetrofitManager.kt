@@ -7,6 +7,7 @@ import android.text.TextUtils
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.ciot.robotlive.bean.AllowResponse
+import com.ciot.robotlive.bean.EventBusBean
 import com.ciot.robotlive.bean.GetVideoResponse
 import com.ciot.robotlive.bean.RobotAllResponse
 import com.ciot.robotlive.bean.RobotData
@@ -34,6 +35,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -198,17 +200,16 @@ class RetrofitManager {
         val res: RobotAllResponse = body
         val total: Int? = res.total
         val robotInfo: List<RobotInfoResponse>? = res.datas
-        mRobotData = mutableListOf()
         if (total == null || total == 0 || robotInfo.isNullOrEmpty()) {
             MyLog.d(TAG, "parseRobotAllResponseBody robotInfo is empty............")
             return
         }
-
         val token = getToken()
         if (token.isNullOrEmpty()) {
             MyLog.e(TAG, "parseRobotAllResponseBody param err--->token: $token")
             return
         }
+        mRobotData = mutableListOf()
         val observables = mutableListOf<Observable<GetVideoResponse>>()
         for (robot in robotInfo) {
             val observable = getWuHanApiService().getVideoCode(token, robot.user)
@@ -232,26 +233,42 @@ class RetrofitManager {
 
                 override fun onSuccess(response: List<GetVideoResponse>) {
                     MyLog.d(TAG,"getVideoCode onSuccess: " + GsonUtils.toJson(response))
-                    response.forEach { res->
-                        val robotData = RobotData()
-                        robotInfo.forEach {
-                            robotData.id = it.id
-                            robotData.link = it.link == true
-                            robotData.name = it.name
-                            robotData.user = it.user
-                            if (robotData.id == res.id) {
-                                robotData.videoCode = res.value
-                            }
+                    val videoCodeMap = response.associateBy { it.account }
+                    robotInfo.forEach { robot ->
+                        val videoCode = videoCodeMap[robot.user]?.value
+                        val robotData = RobotData().apply {
+                            id = robot.id
+                            name = robot.name
+                            link = robot.link == true
+                            user = robot.user
+                            this.videoCode = videoCode
                         }
-                        mRobotData!!.add(robotData)
+                        mRobotData?.add(robotData)
                     }
+//                    robotInfo.forEach {
+//                        val robotData = RobotData()
+//                        robotData.id = it.id
+//                        robotData.link = it.link == true
+//                        robotData.name = it.name
+//                        robotData.user = it.user
+//                        response.forEach { res->
+//                            if (robotData.user == res.account) {
+//                                robotData.videoCode = res.value
+//                            }
+//                        }
+//                        mRobotData!!.add(robotData)
+//                    }
+                    val eventBusBean = EventBusBean()
+                    eventBusBean.eventType = ConstantLogic.EVENT_SHOW_HOME
+                    EventBus.getDefault().post(eventBusBean)
+                    MyLog.d(TAG,"getVideoCode onSuccess mRobotData: " + GsonUtils.toJson(mRobotData))
                 }
             })
     }
 
     fun parseLiveResponseBody(body: StartPlayResponse) {
         val res: StartPlayResponse = body
-        res.handler?.let { setViewHandle(it) }
+        res.handle?.let { setViewHandle(it) }
     }
 
     private fun buildBody(id: String, direction: String): RequestBody {
@@ -336,7 +353,7 @@ class RetrofitManager {
             MyLog.e(TAG, "stopLive param err--->token: $token")
             return
         }
-        getWuHanApiService().robotStopLive(token, id, viewHandle.get())
+        getWuHanApiService().robotStopLive(token, id, getViewHandle())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object: Observer<ResponseBody>{

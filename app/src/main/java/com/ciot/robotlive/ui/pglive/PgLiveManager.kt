@@ -125,7 +125,8 @@ class PgLiveManager {
         }
 
     fun initView(view: LinearLayout) {
-        if (!checkPgLivePlugin()) {
+        MyLog.d(TAG, "initView....")
+        if (!checkPgLivePlugin() || mInit) {
             return
         }
 
@@ -154,10 +155,11 @@ class PgLiveManager {
     }
 
     fun liveLogout() {
+        MyLog.d(TAG, "liveLogout.....mInit=$mInit")
         if (!mInit) {
             return
         }
-
+        mInit = false
         liveDisconnect()
         mListStream.iView?.removeView(mListStream.iWnd)
         pgLibLiveMultiView.Release(mListStream.iWnd)
@@ -179,7 +181,7 @@ class PgLiveManager {
             MyLog.d(TAG, "The stream is exist!")
             return
         }
-
+        MyLog.d(TAG, "liveConnect: id=$id, channel=$channel")
         mListStream.sDevID = id
         mListStream.iVideoID = channel
         if (mLive.Connect(mListStream.sDevID) != pgLibLiveMultiError.PG_ERR_Normal) {

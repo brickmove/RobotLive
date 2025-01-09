@@ -1,6 +1,6 @@
 package com.ciot.robotlive.bean
 
-class RobotData {
+class RobotData() {
     // 设备id
     var id: String? = null
 

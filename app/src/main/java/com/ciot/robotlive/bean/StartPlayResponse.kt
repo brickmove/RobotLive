@@ -2,7 +2,7 @@ package com.ciot.robotlive.bean
 
 class StartPlayResponse {
     // 流标识，（对每次调用启动返回唯一标识）
-    var handler: String? = null
+    var handle: String? = null
 
     var height: Int? = null
     var width: Int? = null
