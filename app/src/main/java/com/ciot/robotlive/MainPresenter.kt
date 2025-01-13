@@ -155,11 +155,17 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
             })
     }
 
-    var startLiveRetry = 0
+    //var startLiveRetry = 0
     fun startRobotLive(id: String, videoCode: String) {
         val channel = 1
         val client = System.currentTimeMillis().toString()
         val mode = 1
+
+        val dealResult = DealResult()
+        dealResult.type = ConstantLogic.MSG_TYPE_LIVE
+        dealResult.selectRobotId = id
+        dealResult.videoCode = videoCode
+        dealResult.client = client
         RetrofitManager.instance.startLive(id, channel, client, mode)
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
@@ -174,22 +180,56 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
                 }
 
                 override fun onError(e: Throwable) {
-                    MyLog.w(TAG,"startLive onError: ${e.message}")
-                    if (startLiveRetry <= 3) {
-                        ThreadUtils.getMainHandler().postDelayed({
-                            startRobotLive(id, videoCode)
-                        }, 500)
-                    } else {
-                        MyLog.e(TAG, " start robot live err count: $startLiveRetry")
-                    }
-                    startLiveRetry++
+//                    MyLog.w(TAG,"startLive onError: ${e.message}")
+//                    if (startLiveRetry <= 3) {
+//                        ThreadUtils.getMainHandler().postDelayed({
+//                            startRobotLive(id, videoCode)
+//                        }, 500)
+//                    } else {
+//                        MyLog.e(TAG, " start robot live err count: $startLiveRetry")
+//                    }
+//                    startLiveRetry++
+                    startLiveVoice(dealResult)
                 }
 
                 override fun onComplete() {
-                    val dealResult = DealResult()
-                    dealResult.type = ConstantLogic.MSG_TYPE_LIVE
-                    dealResult.selectRobotId = id
-                    dealResult.videoCode = videoCode
+                    startLiveVoice(dealResult)
+                }
+            })
+    }
+
+    //var startVoiceRetry = 0
+    fun startLiveVoice(dealResult: DealResult) {
+        val channel = 9
+        val stream = 8
+        val source = 888888
+        RetrofitManager.instance.startVoice(dealResult.selectRobotId!!, channel, dealResult.client!!, stream, source)
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe(object:Observer<StartPlayResponse>{
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onNext(body: StartPlayResponse) {
+                    MyLog.d(TAG, "RobotLiveResponse: " + GsonUtils.toJson(body))
+                    RetrofitManager.instance.parseLiveResponseBody(body)
+                }
+
+                override fun onError(e: Throwable) {
+//                    MyLog.w(TAG,"startLiveVoice onError: ${e.message}")
+//                    if (startVoiceRetry <= 3) {
+//                        ThreadUtils.getMainHandler().postDelayed({
+//                            startLiveVoice(dealResult)
+//                        }, 500)
+//                    } else {
+//                        MyLog.e(TAG, " start robot voice err count: $startVoiceRetry")
+//                    }
+//                    startVoiceRetry++
+                    view.updateFragment(ConstantLogic.MSG_TYPE_LIVE, dealResult)
+                }
+
+                override fun onComplete() {
                     view.updateFragment(ConstantLogic.MSG_TYPE_LIVE, dealResult)
                 }
             })

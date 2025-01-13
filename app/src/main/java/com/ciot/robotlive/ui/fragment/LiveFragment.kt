@@ -193,6 +193,7 @@ class LiveFragment : BaseFragment() {
     private fun stopLive() {
         PgLiveManager.instance.liveLogout()
         mRobotId?.let { RetrofitManager.instance.stopLive(it) }
+        mRobotId?.let { RetrofitManager.instance.stopVoice(it) }
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

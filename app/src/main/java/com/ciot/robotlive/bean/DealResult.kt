@@ -11,6 +11,7 @@ class DealResult {
     // 界面数据设置
     var selectRobotId: String? = null
     var videoCode: String? = null
+    var client: String? = null
     var robotList: List<String>? = null
     var robotInfoList: List<RobotData>? = null
 

@@ -71,7 +71,7 @@ class RetrofitManager {
     private var tcpIp: AtomicReference<String> = AtomicReference()
     private var tcpPort: AtomicReference<Int> = AtomicReference()
     private var viewHandle: AtomicReference<String> = AtomicReference()
-
+    private var voiceHandle: AtomicReference<String> = AtomicReference()
     @Volatile
     private var mNidMap: MutableMap<String, String>? = HashMap()
     @Volatile
@@ -245,19 +245,6 @@ class RetrofitManager {
                         }
                         mRobotData?.add(robotData)
                     }
-//                    robotInfo.forEach {
-//                        val robotData = RobotData()
-//                        robotData.id = it.id
-//                        robotData.link = it.link == true
-//                        robotData.name = it.name
-//                        robotData.user = it.user
-//                        response.forEach { res->
-//                            if (robotData.user == res.account) {
-//                                robotData.videoCode = res.value
-//                            }
-//                        }
-//                        mRobotData!!.add(robotData)
-//                    }
                     val eventBusBean = EventBusBean()
                     eventBusBean.eventType = ConstantLogic.EVENT_SHOW_HOME
                     EventBus.getDefault().post(eventBusBean)
@@ -329,6 +316,44 @@ class RetrofitManager {
 
                 override fun onError(e: Throwable) {
                     MyLog.w(TAG,"stopMove onError: ${e.message}")
+                }
+
+                override fun onComplete() {
+
+                }
+            })
+    }
+
+    fun startVoice(id: String, channel: Int, client: String, stream: Int, source: Int): Observable<StartPlayResponse>? {
+        val token = getToken()
+        if (token.isNullOrEmpty()) {
+            MyLog.e(TAG, "startVoice param err--->token: $token")
+            return null
+        }
+
+        return getWuHanApiService().robotStartVoice(token, id, channel, client, stream, source)
+    }
+
+    fun stopVoice(id: String) {
+        val token = getToken()
+        if (token.isNullOrEmpty()) {
+            MyLog.e(TAG, "stopVoice param err--->token: $token")
+            return
+        }
+        getWuHanApiService().robotStopVoice(token, id, getVoiceHandle())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: Observer<ResponseBody>{
+                override fun onSubscribe(d: Disposable) {
+                    addSubscription(d)
+                }
+
+                override fun onNext(body: ResponseBody) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.w(TAG,"stopVoice onError: ${e.message}")
                 }
 
                 override fun onComplete() {
@@ -700,6 +725,14 @@ class RetrofitManager {
 
     fun setViewHandle(handle: String) {
         return viewHandle.set(handle)
+    }
+
+    fun getVoiceHandle(): String? {
+        return voiceHandle.get()
+    }
+
+    fun setVoiceHandle(handle: String) {
+        return voiceHandle.set(handle)
     }
 
     fun onUnsubscribe() {

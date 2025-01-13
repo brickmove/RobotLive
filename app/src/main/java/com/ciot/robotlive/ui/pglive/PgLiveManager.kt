@@ -6,7 +6,6 @@ import android.widget.LinearLayout
 import com.ciot.robotlive.constant.NetConstant
 import com.ciot.robotlive.utils.ContextUtil
 import com.ciot.robotlive.utils.MyLog
-import com.ciot.robotlive.utils.ToastUtil
 import com.peergine.android.livemulti.pgLibLiveMultiError
 import com.peergine.android.livemulti.pgLibLiveMultiRender
 import com.peergine.android.livemulti.pgLibLiveMultiView
@@ -118,7 +117,7 @@ class PgLiveManager {
                 }
 
             }
-            ToastUtil.showToast(0, ContextUtil.getContext(), sInfo)
+            //ToastUtil.showToast(0, ContextUtil.getContext(), sInfo)
             MyLog.d(
                 TAG_EVENT, "OnEvent: Act=$sAct, Data=$sData, sCapID=$sCapID"
             )
@@ -170,10 +169,12 @@ class PgLiveManager {
 
     private fun liveDisconnect() {
         mLive.VideoStop(mListStream.sDevID, mListStream.iVideoID)
+        mLive.AudioStop(mListStream.sDevID, mListStream.iAudioID)
         mListStream.bConnect = false
         mLive.Disconnect(mListStream.sDevID)
         mListStream.sDevID = ""
         mListStream.iVideoID = 0
+        mListStream.iAudioID = 0
     }
 
     fun liveConnect(id: String, channel: Int) {
@@ -184,11 +185,16 @@ class PgLiveManager {
         MyLog.d(TAG, "liveConnect: id=$id, channel=$channel")
         mListStream.sDevID = id
         mListStream.iVideoID = channel
+        mListStream.iAudioID = channel
         if (mLive.Connect(mListStream.sDevID) != pgLibLiveMultiError.PG_ERR_Normal) {
             return
         }
 
         mListStream.bConnect = true
         mLive.VideoStart(mListStream.sDevID, mListStream.iVideoID, "", mListStream.iWnd)
+
+        val sAudioParam = "(AecConfig){1,-1,-1,-1,-1}"
+        mLive.AudioStart(mListStream.sDevID, mListStream.iAudioID, sAudioParam)
+        mLive.AudioSyncDelay(mListStream.sDevID, mListStream.iAudioID, mListStream.iVideoID)
     }
 }

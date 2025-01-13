@@ -66,4 +66,23 @@ interface WuhanApiService {
                       @Query("id") id: String?,
                       @Query("handle") handle: String?,
                       ): Observable<ResponseBody>
+
+    /*启动实时语音对讲*/
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
+    @POST("/api/Robots/play/startVoice")
+    fun robotStartVoice(@Query("access_token") token: String?,
+                       @Query("id") id: String?,
+                       @Query("channel") channel: Int?,
+                       @Query("client") client: String?,
+                       @Query("stream") mode: Int?,
+                        @Query("source") source: Int?
+    ): Observable<StartPlayResponse>
+
+    /*关闭实时语音对讲*/
+    @Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER + Api.DOMAIN_NAME_PROPERTY)
+    @POST("/api/Robots/play/stopVoice")
+    fun robotStopVoice(@Query("access_token") token: String?,
+                      @Query("id") id: String?,
+                      @Query("handle") handle: String?,
+    ): Observable<ResponseBody>
 }

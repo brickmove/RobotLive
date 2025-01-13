@@ -103,6 +103,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
     fun showLive(id: String, videoCode: String) {
         MyLog.d(TAG, "MainActivity showLive >>>>>>>>>")
         mPresenter?.startRobotLive(id, videoCode)
+
     }
 
     private fun initListener() {
