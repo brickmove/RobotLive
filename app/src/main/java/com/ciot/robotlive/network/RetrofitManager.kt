@@ -258,6 +258,11 @@ class RetrofitManager {
         res.handle?.let { setViewHandle(it) }
     }
 
+    fun parseVoiceResponseBody(body: StartPlayResponse) {
+        val res: StartPlayResponse = body
+        res.handle?.let { setVoiceHandle(it) }
+    }
+
     private fun buildBody(id: String, direction: String): RequestBody {
         val jsonObject = JsonObject()
         jsonObject.addProperty("id", id)
@@ -336,8 +341,8 @@ class RetrofitManager {
 
     fun stopVoice(id: String) {
         val token = getToken()
-        if (token.isNullOrEmpty()) {
-            MyLog.e(TAG, "stopVoice param err--->token: $token")
+        if (token.isNullOrEmpty() || getVoiceHandle().isNullOrEmpty()) {
+            MyLog.e(TAG, "stopVoice param err--->token: $token, handle: " + getVoiceHandle())
             return
         }
         getWuHanApiService().robotStopVoice(token, id, getVoiceHandle())
@@ -357,7 +362,7 @@ class RetrofitManager {
                 }
 
                 override fun onComplete() {
-
+                    setVoiceHandle("")
                 }
             })
     }
@@ -374,8 +379,8 @@ class RetrofitManager {
 
     fun stopLive(id: String) {
         val token = getToken()
-        if (token.isNullOrEmpty()) {
-            MyLog.e(TAG, "stopLive param err--->token: $token")
+        if (token.isNullOrEmpty() || getViewHandle().isNullOrEmpty()) {
+            MyLog.e(TAG, "stopLive param err--->token: $token, handle: " + getViewHandle())
             return
         }
         getWuHanApiService().robotStopLive(token, id, getViewHandle())
@@ -395,7 +400,7 @@ class RetrofitManager {
                 }
 
                 override fun onComplete() {
-
+                    setViewHandle("")
                 }
             })
     }

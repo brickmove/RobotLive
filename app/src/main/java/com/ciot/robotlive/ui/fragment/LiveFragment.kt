@@ -9,7 +9,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.blankj.utilcode.util.GsonUtils
 import com.ciot.robotlive.bean.DealResult
+import com.ciot.robotlive.bean.StartPlayResponse
 import com.ciot.robotlive.databinding.FragmentLiveBinding
 import com.ciot.robotlive.network.RetrofitManager
 import com.ciot.robotlive.ui.base.BaseFragment
@@ -17,6 +19,9 @@ import com.ciot.robotlive.ui.pglive.PgLiveManager
 import com.ciot.robotlive.ui.viewmodel.CountdownViewModel
 import com.ciot.robotlive.ui.widgets.DirectionFourKey
 import com.ciot.robotlive.utils.MyLog
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class LiveFragment : BaseFragment() {
@@ -24,8 +29,9 @@ class LiveFragment : BaseFragment() {
         private const val TAG = "LiveFragment"
         private const val UP = "forward"
         private const val DOWN = "backward"
-        private const val LEFT = "left"
-        private const val RIGHT = "right"
+        // 客户要求左右对调
+        private const val LEFT = "right"
+        private const val RIGHT = "left"
     }
     private lateinit var binding : FragmentLiveBinding
     private var wvLive: LinearLayout? = null
@@ -118,7 +124,36 @@ class LiveFragment : BaseFragment() {
         mVideoCode = data.videoCode
         MyLog.d(TAG, "refreshData mRobotId: $mRobotId, mVideoCode: $mVideoCode")
         setupCountdown()
-        mVideoCode?.let { PgLiveManager.instance.liveConnect(it, 1) }
+        mVideoCode?.let { PgLiveManager.instance.liveConnect(it, 1, 1) }
+        startLiveVoice(data)
+        //PgLiveManager.instance.startLiveAudio(9)
+    }
+
+    private fun startLiveVoice(dealResult: DealResult) {
+        val channel = 9
+        val stream = 9
+        val source = 888888
+        RetrofitManager.instance.startVoice(dealResult.selectRobotId!!, channel, dealResult.client!!, stream, source)
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe(object: io.reactivex.Observer<StartPlayResponse> {
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onNext(body: StartPlayResponse) {
+                    MyLog.d(TAG, "startLiveVoice: " + GsonUtils.toJson(body))
+                    RetrofitManager.instance.parseVoiceResponseBody(body)
+                }
+
+                override fun onError(e: Throwable) {
+                    MyLog.e(TAG,"startLiveVoice onError: ${e.message}")
+                }
+
+                override fun onComplete() {
+                    PgLiveManager.instance.startLiveAudio(stream, dealResult.client)
+                }
+            })
     }
 
     private fun setupCountdown() {
@@ -192,8 +227,10 @@ class LiveFragment : BaseFragment() {
 
     private fun stopLive() {
         PgLiveManager.instance.liveLogout()
-        mRobotId?.let { RetrofitManager.instance.stopLive(it) }
-        mRobotId?.let { RetrofitManager.instance.stopVoice(it) }
+        if (!mRobotId.isNullOrEmpty()) {
+            RetrofitManager.instance.stopLive(mRobotId!!)
+            RetrofitManager.instance.stopVoice(mRobotId!!)
+        }
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

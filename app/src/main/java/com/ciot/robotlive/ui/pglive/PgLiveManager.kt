@@ -6,10 +6,12 @@ import android.widget.LinearLayout
 import com.ciot.robotlive.constant.NetConstant
 import com.ciot.robotlive.utils.ContextUtil
 import com.ciot.robotlive.utils.MyLog
+import com.google.gson.Gson
 import com.peergine.android.livemulti.pgLibLiveMultiError
 import com.peergine.android.livemulti.pgLibLiveMultiRender
 import com.peergine.android.livemulti.pgLibLiveMultiView
 import com.peergine.plugin.lib.pgLibJNINode
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -22,7 +24,7 @@ class PgLiveManager {
         private var TAG = "PgLiveManager"
         private var TAG_EVENT = "PgLiveManager_Event"
         private var MAX_VIEW_NUM = 4
-
+        private var CLIENT_TYPE = 1
         val instance: PgLiveManager
             get() = RenderViewHolder.holder
     }
@@ -177,15 +179,15 @@ class PgLiveManager {
         mListStream.iAudioID = 0
     }
 
-    fun liveConnect(id: String, channel: Int) {
+    fun liveConnect(id: String, videoId: Int, audioId: Int) {
         if (mListStream.bConnect) {
             MyLog.d(TAG, "The stream is exist!")
             return
         }
-        MyLog.d(TAG, "liveConnect: id=$id, channel=$channel")
+        MyLog.d(TAG, "liveConnect: id=$id, videoId=$videoId, audioId=$audioId")
         mListStream.sDevID = id
-        mListStream.iVideoID = channel
-        mListStream.iAudioID = channel
+        mListStream.iVideoID = videoId
+        //mListStream.iAudioID = audioId
         if (mLive.Connect(mListStream.sDevID) != pgLibLiveMultiError.PG_ERR_Normal) {
             return
         }
@@ -193,8 +195,53 @@ class PgLiveManager {
         mListStream.bConnect = true
         mLive.VideoStart(mListStream.sDevID, mListStream.iVideoID, "", mListStream.iWnd)
 
-        val sAudioParam = "(AecConfig){1,-1,-1,-1,-1}"
+        //val sAudioParam = ""
+        //mLive.AudioStart(mListStream.sDevID, mListStream.iAudioID, sAudioParam)
+        //mLive.AudioSyncDelay(mListStream.sDevID, mListStream.iAudioID, mListStream.iVideoID)
+    }
+
+    // 静音操作
+    fun liveAudioMute(bInput: Boolean, bOutput: Boolean) {
+        mLive.AudioMute(mListStream.sDevID, mListStream.iAudioID, bInput, bOutput)
+    }
+
+    // 开启音频
+    fun startLiveAudio(audioId: Int, client: String?) {
+        val sAudioParam = ""
+        mListStream.iAudioID = audioId
+        MyLog.d(TAG, "startLiveAudio sDevID=${mListStream.sDevID}, iAudioID=${mListStream.iAudioID}")
         mLive.AudioStart(mListStream.sDevID, mListStream.iAudioID, sAudioParam)
-        mLive.AudioSyncDelay(mListStream.sDevID, mListStream.iAudioID, mListStream.iVideoID)
+
+        if (!client.isNullOrEmpty()) {
+            sendLiveMsg(client, CLIENT_TYPE)
+        }
+    }
+
+    // 发送客户端消息
+    private fun sendLiveMsg(client: String, clientType: Int) {
+        val clientBean = ClientBean(
+            client = client,
+            clientType = clientType,
+            audioId = mListStream.iAudioID,
+            videoId = mListStream.iVideoID
+        )
+        val data = Gson().toJson(clientBean)
+
+        var attempts = 0
+        val maxRetries = 100
+        var ret = -1
+        while (attempts < maxRetries) {
+            ret = mLive.MessageSend(mListStream.sDevID, data)
+            MyLog.d(TAG, "sendLiveMsg ret=$ret, attempts=$attempts")
+            if (ret == 0) {
+                break
+            } else {
+                attempts++
+                TimeUnit.MILLISECONDS.sleep(1000)
+            }
+        }
+
+        //val ret = mLive.MessageSend("_CAP_YHPR1150B002SZGM202101140172", "Message")
+        MyLog.d(TAG, "sendLiveMsg dev id: ${mListStream.sDevID}, ret: $ret")
     }
 }
