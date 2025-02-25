@@ -17,7 +17,7 @@ android {
         minSdk = 26
         targetSdk = 34
 
-        versionName = "V1.0.0"
+        versionName = "V1.0.1"
         val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
         versionCode = Integer.parseInt(dateFormat.format(Date()))
 

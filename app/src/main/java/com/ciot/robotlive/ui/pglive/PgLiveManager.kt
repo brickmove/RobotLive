@@ -187,7 +187,7 @@ class PgLiveManager {
         MyLog.d(TAG, "liveConnect: id=$id, videoId=$videoId, audioId=$audioId")
         mListStream.sDevID = id
         mListStream.iVideoID = videoId
-        //mListStream.iAudioID = audioId
+        mListStream.iAudioID = audioId
         if (mLive.Connect(mListStream.sDevID) != pgLibLiveMultiError.PG_ERR_Normal) {
             return
         }
@@ -195,9 +195,9 @@ class PgLiveManager {
         mListStream.bConnect = true
         mLive.VideoStart(mListStream.sDevID, mListStream.iVideoID, "", mListStream.iWnd)
 
-        //val sAudioParam = ""
-        //mLive.AudioStart(mListStream.sDevID, mListStream.iAudioID, sAudioParam)
-        //mLive.AudioSyncDelay(mListStream.sDevID, mListStream.iAudioID, mListStream.iVideoID)
+        val sAudioParam = ""
+        mLive.AudioStart(mListStream.sDevID, mListStream.iAudioID, sAudioParam)
+        mLive.AudioSyncDelay(mListStream.sDevID, mListStream.iAudioID, mListStream.iVideoID)
     }
 
     // 静音操作

@@ -125,7 +125,7 @@ class LiveFragment : BaseFragment() {
         MyLog.d(TAG, "refreshData mRobotId: $mRobotId, mVideoCode: $mVideoCode")
         setupCountdown()
         mVideoCode?.let { PgLiveManager.instance.liveConnect(it, 1, 1) }
-        startLiveVoice(data)
+        //startLiveVoice(data)
         //PgLiveManager.instance.startLiveAudio(9)
     }
 
