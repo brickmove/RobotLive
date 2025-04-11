@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
+import com.ciot.robotlive.R
 import com.ciot.robotlive.bean.DealResult
 import com.ciot.robotlive.bean.StartPlayResponse
 import com.ciot.robotlive.databinding.FragmentLiveBinding
@@ -46,6 +47,8 @@ class LiveFragment : BaseFragment() {
     private var mVideoCode: String? = null
     private var mChannel: Int? = null
     private var savedState: Bundle? = null
+    private var isVoiceOpen: Boolean = true
+    private var isMicroOpen: Boolean = true
 
     override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View {
         binding = FragmentLiveBinding.inflate(layoutInflater)
@@ -89,6 +92,28 @@ class LiveFragment : BaseFragment() {
             }
         })
         directionFourKey?.setOnDirectionListener(onDirectionListener)
+
+        ibVoiceInput?.setOnClickListener{
+            if (isMicroOpen) {
+                ibVoiceInput!!.setBackgroundResource(R.drawable.voice_input_close)
+                isMicroOpen = false
+            } else {
+                ibVoiceInput!!.setBackgroundResource(R.drawable.voice_input_open)
+                isMicroOpen = true
+            }
+            PgLiveManager.instance.liveAudioMute(isMicroOpen, isVoiceOpen)
+        }
+
+        ibVoiceOutput?.setOnClickListener{
+            if (isVoiceOpen) {
+                ibVoiceOutput!!.setBackgroundResource(R.drawable.voice_output_close)
+                isVoiceOpen = false
+            } else {
+                ibVoiceOutput!!.setBackgroundResource(R.drawable.voice_output_open)
+                isVoiceOpen = true
+            }
+            PgLiveManager.instance.liveAudioMute(isMicroOpen, isVoiceOpen)
+        }
     }
 
     private fun updateCountdownText(millisUntilFinished: Long) {

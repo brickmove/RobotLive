@@ -68,7 +68,7 @@
         android:layout_marginStart="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/wv_live"
-        android:background="@drawable/voice_output" />
+        android:background="@drawable/voice_output_open" />
 
     <ImageButton
         android:id="@+id/bt_voice_input"
@@ -78,7 +78,7 @@
         android:layout_marginStart="310dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/wv_live"
-        android:background="@drawable/voice_input" />
+        android:background="@drawable/voice_input_open" />
 
     <!--摇杆-->
     <include
