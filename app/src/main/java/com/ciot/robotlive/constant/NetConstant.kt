@@ -10,7 +10,8 @@ object NetConstant {
     private const val IP_US: String = "usom.gfai-robotics.com"
     private const val IP_HK: String = "gfai-robotics.com"
 
-    var DEFAULT_SERVICE_URL = "http://$IP_DEV:9899/"
+    //var DEFAULT_SERVICE_URL = "http://$IP_DEV:9899/"
+    var DEFAULT_SERVICE_URL = "http://$IP_CN:9899/"
 
     var DEV_SERVICE_URL = "http://$IP_DEV:9899/"
     var CN_SERVICE_URL = "http://$IP_CN:9899/"

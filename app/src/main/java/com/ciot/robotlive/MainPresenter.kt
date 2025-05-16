@@ -200,10 +200,12 @@ class MainPresenter(private var view: MainActivity) : BasePresenter<MainView>() 
 
     // 设置默认服务器
     private fun setDefaultServer() {
-        if (SPUtils.getString(ConstantLogic.SP_BIND_SERVER).isNullOrEmpty()) {
-            SPUtils.putString(ConstantLogic.SP_BIND_SERVER, NetConstant.DEFAULT_SERVICE_URL)
-        }
-        SPUtils.getString(ConstantLogic.SP_BIND_SERVER)
-            ?.let { RetrofitManager.instance.setDefaultServer(it) }
+//        if (SPUtils.getString(ConstantLogic.SP_BIND_SERVER).isNullOrEmpty()) {
+//            SPUtils.putString(ConstantLogic.SP_BIND_SERVER, NetConstant.DEFAULT_SERVICE_URL)
+//        }
+//        SPUtils.getString(ConstantLogic.SP_BIND_SERVER)
+//            ?.let { RetrofitManager.instance.setDefaultServer(it) }
+
+        RetrofitManager.instance.setDefaultServer(NetConstant.DEFAULT_SERVICE_URL)
     }
 }

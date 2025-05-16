@@ -180,7 +180,8 @@ class MainActivity : BaseActivity<MainPresenter>(), MainView, View.OnClickListen
 
     fun signIn(account: String, password: String) {
         //mPresenter?.signIn(account, password)
-        mPresenter?.signIn("gcfi9416", "jfEN0hQND")
+        //mPresenter?.signIn("gcfi9416", "jfEN0hQND")
+        mPresenter?.signIn("wuoo8438", "QNoM5Ed9R")
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

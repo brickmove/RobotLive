@@ -2,5 +2,6 @@
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">dev.csstrobot.com</domain>
+        <domain includeSubdomains="true">robot.csstrobot.com</domain>
     </domain-config>
 </network-security-config>
